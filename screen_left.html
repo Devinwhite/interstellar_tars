@@ -1,0 +1,201 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Tars Screen - LEFT</title>
+		<link rel="icon" href="assets/fav.ico">
+
+		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Tars Screen - LEFT" />
+		
+		<style>
+			body {
+				background: #000;
+				scroll-behavior: smooth;
+			}
+			#terminal {
+				white-space: pre-wrap;
+				font-family: Arial, Helvetica, sans-serif;
+				font-weight: 900;
+				font-size: 9pt;
+				/* line-height: 1.5; */
+				margin-top: 100px; 
+				max-height: 990px; 
+				overflow: hidden;
+			}
+			.app__layout {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				width: 100%;
+				height: 100%;
+			}
+			.app__content {
+				width:  800px;
+				height: 100%;
+				margin: 0 auto;
+				padding-top: 0px;
+			}
+		</style>
+		
+	</head>
+
+	<body>
+
+		<div class="app__layout">
+			<div class="app__content">
+				<div id="terminal"></div>
+			</div>
+		</div>
+		
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pressure/2.1.2/jquery.pressure.min.js"></script>
+		<script>
+			var og_src = "";
+			var src = "";
+			var speed = 5;
+			var color = "white";
+			var isPaused = false;
+			var isLongPaused = false;
+			var clearOld = 50000;
+			
+			$(function() {
+				$.get( "screen_left.txt",{}, function(rd) {
+					og_src = rd;
+					src = og_src;
+
+					startTyper();
+					
+					setTimeout(function() {
+						window.location.reload();
+					}, 300000);
+				});			
+			});
+			
+
+			function typeNext(){
+				if(!isPaused && !isLongPaused){
+
+					//clear memory
+					if($("#terminal").html().length > clearOld){
+						$("#terminal").html($("#terminal").html().slice(clearOld/2, $("#terminal").html().length));
+					}
+
+					if (src.length == 0) {
+						//clearTyper();
+						//return;
+						src = og_src;
+					}
+					
+					if(src.slice(0, speed).includes("~")){
+						
+						findString = src.slice(0, speed+25);
+						start_pos = findString.indexOf('~') + 1;
+						end_pos = findString.indexOf('-',start_pos);
+						
+						if(findString.slice(start_pos,end_pos) == "LONGPAUSE"){
+							isLongPaused = true;
+							src = src.replace('~LONGPAUSE-','');
+							return;
+						}
+
+						prefixContent = findString.slice(0,start_pos-1);
+						if(prefixContent.length > 0){
+							prefix = "<span style='color:"+color+"; text-shadow: 0px 0px 7px "+color+";'>"+prefixContent+"</span>";
+						}else{
+							prefix = "";
+						}
+
+						//prefix with old color
+						src = src.slice(start_pos-1);
+						$('#terminal').append(prefix);
+						
+						//newColor
+						color = findString.slice(start_pos,end_pos);
+						src = src.replace('~'+color+'-','');
+						
+						//check if theres are more than one color in this batch
+						nextTilde = findString.indexOf('~',end_pos+1);
+						if(nextTilde){
+							content = "<span style='color:"+color+"; text-shadow: 0px 0px 7px "+color+";'>"+findString.slice(end_pos+1,nextTilde)+"</span>";
+							src = src.slice(findString.slice(end_pos+1,nextTilde).length);
+							$('#terminal').append(content);
+						}else{
+							content = "<span style='color:"+color+"; text-shadow: 0px 0px 7px "+color+";'>"+findString.slice(end_pos+1,speed)+"</span>";
+							src = src.slice(speed);
+							$('#terminal').append(content);
+						}
+					}else{
+						content = "<span style='color:"+color+"; text-shadow: 0px 0px 7px "+color+";'>"+src.slice(0,speed)+"</span>";
+						src = src.slice(speed);
+						$('#terminal').append(content);
+					}
+					
+					$("#terminal").scrollTop($("#terminal")[0].scrollHeight);
+				}else{
+					clearTyper();
+					if(isLongPaused){
+						pauseTimeout = setTimeout(function () {
+							isLongPaused = false;
+							startTyper();
+						}, getRandomInt(2000,10000));
+					}else{
+						pauseTimeout = setTimeout(function () {
+							isPaused = false;
+							startTyper();
+						}, getRandomInt(200,1500));
+					}
+				}
+			};
+
+			function getRandomInt(min, max) {
+				return Math.floor(Math.random() * (max - min + 1) + min);
+			}
+
+			function clearTyper(){
+				clearInterval(interval);
+				clearInterval(pauseInterval);
+				clearInterval(speedInterval);
+			}
+
+			function startTyper(){
+				interval = setInterval(typeNext, 70);
+				pauseInterval = setInterval(function(){
+					isPaused = true;
+				}, 2000);
+				speedInterval = setInterval(function(){
+					speed = getRandomInt(2,10);
+				}, 600);
+			}
+		
+			$('body').pressure({
+				start: function(event){
+					// this is called on force start
+				},
+				end: function(){
+					// this is called on force end
+				},
+				startDeepPress: function(event){
+					// this is called on "force click" / "deep press", aka once the force is greater than 0.5
+					window.location.reload();
+				},
+				endDeepPress: function(){
+					// this is called when the "force click" / "deep press" end
+				},
+				change: function(force, event){
+					// this is called every time there is a change in pressure
+					// 'force' is a value ranging from 0 to 1
+				},
+				unsupported: function(){
+					// NOTE: this is only called if the polyfill option is disabled!
+					// this is called once there is a touch on the element and the device or browser does not support Force or 3D touch
+				}
+			});
+		</script>
+	</body>
+</html>
