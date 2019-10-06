@@ -6,7 +6,3 @@
 { 
    "succcess":true
 }
-
-
-gpio -g mode 8 out
-gpio -g write 8 1
