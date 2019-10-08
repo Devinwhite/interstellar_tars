@@ -11,6 +11,8 @@
 
 		<button type="button" id="clickOn">ON</button><br>
 		<button type="button" id="clickOff">OFF</button><br>
+
+		<button type="button" id="clickBlink">BLINK TEST</button><br>
 		
 		<script src="//cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
 
@@ -18,12 +20,17 @@
 			$(function() {
 				$('#clickOn').on('click', function() {
 					$.get( "led_on.php",{}, function(rd) {
-						alert("LED TURNED ON");
+						//alert("LED TURNED ON");
 					}, "json");
 				});	
 				$('#clickOff').on('click', function() {
 					$.get( "led_off.php",{}, function(rd) {
-						alert("LED TURNED OFF");
+						//alert("LED TURNED OFF");
+					}, "json");
+				});	
+				$('#clickBlink').on('click', function() {
+					$.get( "blink.php",{}, function(rd) {
+						//blink
 					}, "json");
 				});			
 			});
