@@ -13,6 +13,8 @@
 		<button type="button" id="clickOff">OFF</button><br>
 
 		<button type="button" id="clickBlink">BLINK TEST</button><br>
+		<button type="button" id="clickAudio1">MP3 TEST 1</button><br>
+		<button type="button" id="clickAudio2">MP3 TEST 2</button><br>
 		
 		<script src="//cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
 
@@ -31,6 +33,19 @@
 				$('#clickBlink').on('click', function() {
 					$.get( "blink.php",{}, function(rd) {
 						//blink
+					}, "json");
+				});
+				$('#clickAudio1').on('click', function() {
+					$.get( "audio1.php",{}, function(rd) {
+						//mp3
+					}, "json");
+				});
+				$('#clickAudio2').on('click', function() {
+					$.get( "blinkFast.php",{}, function(rd) {
+						//blink fast
+					}, "json");
+					$.get( "audio2.php",{}, function(rd) {
+						//mp3
 					}, "json");
 				});			
 			});
