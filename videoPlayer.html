@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Tars Screen - VIDEO</title>
+		<link rel="icon" href="assets/fav.ico">
+
+        <link rel="apple-touch-icon" href="assets/apple-touch-icon_left.png">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Tars LEFT" />
+        
+		<style>
+			body {
+				background: #000;
+			}
+            video {
+                left: 50%;
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+		</style>
+		
+	</head>
+
+	<body>
+        <video id="myMovie" name="myMovie" width="800" controls autoplay playsinline>
+            <source src="mp4/Interstellar Bonus Disc TARS and CASE.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+       
+        <button onclick="conn.send('Hello World!');"> test </button>
+
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+
+        <script>
+            var conn = new WebSocket('ws://192.168.1.27:8080');
+            conn.onopen = function(e) {
+                console.log("Connection established!");
+            };
+
+            conn.onmessage = function(e) {
+                console.log(e.data);
+            };
+        </script>
+	</body>
+</html>

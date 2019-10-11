@@ -1,0 +1,171 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Tars Control Panel</title>
+		<link rel="icon" href="assets/fav.ico">
+
+		<link rel="apple-touch-icon" href="assets/apple-touch-icon_controls.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Tars CTRL" />
+		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		
+		<style>
+			body{
+				background: #3F5876;
+			}
+			.bars-container {
+				overflow: hidden;
+				padding-top: 100px;
+				padding-bottom: 0px;
+			}
+
+			.bar {
+				width: 10px;
+				height: 40px;
+				background: #17A2B8;
+				border-radius: 0px;
+				transition: .1s linear;
+				display: inline-block;
+			}
+		</style>
+
+	</head>
+	
+
+	<body class="py-4">
+		<div class="container">
+			<div>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickOn">ON</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickOff">OFF</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickBlink">BLINK TEST</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio1">MP3 TEST 1</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio2">MP3 TEST 2</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickVideo">Video TEST</button><br>
+			</div>
+			
+			<!-- <center>
+				<div class="bars-container">
+					<div class="bar" id="bar"></div>
+					<div class="bar" id="bar2"></div>
+					<div class="bar" id="bar3"></div>
+					<div class="bar" id="bar4"></div>
+					<div class="bar" id="bar5"></div>
+					<div class="bar" id="bar6"></div>
+					<div class="bar" id="bar7"></div>
+					<div class="bar" id="bar8"></div>
+				</div>
+			</center> -->
+		</div>
+
+		<script src="//cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		
+		<script>
+			$(function() {
+				$('#clickOn').on('click', function() {
+					$.get( "led_on.php",{}, function(rd) {
+						//alert("LED TURNED ON");
+					}, "json");
+				});	
+				$('#clickOff').on('click', function() {
+					$.get( "led_off.php",{}, function(rd) {
+						//alert("LED TURNED OFF");
+					}, "json");
+				});	
+				$('#clickBlink').on('click', function() {
+					$.get( "blink.php",{}, function(rd) {
+						//blink
+					}, "json");
+				});
+				$('#clickAudio1').on('click', function() {
+					$.get( "audio1.php",{}, function(rd) {
+						//mp3
+					}, "json");
+				});
+				$('#clickAudio2').on('click', function() {
+					$.get( "blinkFast.php",{}, function(rd) {
+						//blink fast
+					}, "json");
+					$.get( "audio2.php",{}, function(rd) {
+						//mp3
+					}, "json");
+				});			
+			});
+
+			/* function scaleanim() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim, 100);
+
+			function scaleanim2() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar2").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim2, 100);
+
+			function scaleanim3() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar3").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim3, 100);
+
+			function scaleanim4() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar4").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim4, 100);
+
+			function scaleanim5() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar5").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim5, 100);
+
+			function scaleanim6() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar6").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim6, 100);
+
+			function scaleanim7() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar7").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim7, 100);
+
+			function scaleanim8() {
+				var randno;
+				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
+				document.getElementById("bar8").style.transform = "scaleY(" + randno + ")";
+			}
+
+			setInterval(scaleanim8, 100); */
+		</script>
+
+
+	</body>
+
+</html>
+
