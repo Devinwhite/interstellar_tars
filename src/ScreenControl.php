@@ -3,7 +3,7 @@ namespace TarsScreens;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class Chat implements MessageComponentInterface {
+class TarsScreens implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
