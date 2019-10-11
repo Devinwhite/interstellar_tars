@@ -32,6 +32,11 @@
 				transition: .1s linear;
 				display: inline-block;
 			}
+
+			.btn:hover {
+				background: #17A2B8;
+			}
+			
 		</style>
 
 	</head>
@@ -46,6 +51,7 @@
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio1">MP3 TEST 1</button><br>
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio2">MP3 TEST 2</button><br>
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickVideo">Video TEST</button><br>
+				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickReload">Reload Screen</button><br>
 			</div>
 			
 			<!-- <center>
@@ -69,6 +75,16 @@
 		
 		<script>
 			$(function() {
+				var conn = new WebSocket('ws://'+location.hostname+':8080');
+            
+				conn.onopen = function(e) {
+					console.log("Connection established!");
+				};
+
+				conn.onmessage = function(e) {
+					console.log(e.data);
+				};
+
 				$('#clickOn').on('click', function() {
 					$.get( "led_on.php",{}, function(rd) {
 						//alert("LED TURNED ON");
@@ -96,7 +112,13 @@
 					$.get( "audio2.php",{}, function(rd) {
 						//mp3
 					}, "json");
-				});			
+				});
+				$('#clickVideo').on('click', function() {
+					conn.send('videoPlayer.html');
+				});
+				$('#clickReload').on('click', function() {
+					conn.send('screen_left.html');
+				});						
 			});
 
 			/* function scaleanim() {
