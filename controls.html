@@ -51,6 +51,10 @@
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio1">MP3 TEST 1</button><br>
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio2">MP3 TEST 2</button><br>
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickVideo">Video TEST</button><br>
+				<div id="videoCntrl" class="btn-group w-100" role="group" style="display:none;">
+					<button type="button" class="btn btn-info btn-lg mb-3" id="clickVideoPause">Pause Video</button><br>
+					<button type="button" class="btn btn-info btn-lg mb-3" id="clickVideoPlay">Resume Video</button><br>
+				</div>
 				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickReload">Reload Screen</button><br>
 			</div>
 			
@@ -115,9 +119,17 @@
 				});
 				$('#clickVideo').on('click', function() {
 					conn.send('videoPlayer.html');
+					$('#videoCntrl').show();
 				});
+				$('#clickVideoPause').on('click', function() {
+					conn.send('pause');
+				});
+				$('#clickVideoPlay').on('click', function() {
+					conn.send('play');
+				});				
 				$('#clickReload').on('click', function() {
 					conn.send('screen_left.html');
+					$('#videoCntrl').hide();
 				});						
 			});
 
