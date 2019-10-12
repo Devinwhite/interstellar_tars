@@ -65,21 +65,6 @@
 			var clearOld = 50000;
 			
 			$(function() {
-				var conn = new WebSocket('ws://'+location.hostname+':8080');
-            
-				conn.onopen = function(e) {
-					console.log("Connection established!");
-				};
-
-				conn.onmessage = function(e) {
-					if(e.data == "reload"){
-						window.location.reload();
-					}else{
-						window.location.href = e.data;
-					}
-					console.log(e.data);
-				};
-
 				$.get( "screen_right.txt",{}, function(rd) {
 					og_src = rd;
 					src = og_src;
