@@ -18,12 +18,12 @@
 			body{
 				background: #3F5876;
 			}
-			.bars-container {
+			
+			/* .bars-container {
 				overflow: hidden;
 				padding-top: 100px;
 				padding-bottom: 0px;
 			}
-
 			.bar {
 				width: 10px;
 				height: 40px;
@@ -31,12 +31,58 @@
 				border-radius: 0px;
 				transition: .1s linear;
 				display: inline-block;
+			} */
+
+			.controls {
+				background-color: rgba(0, 0, 0, 0.1)
 			}
 
 			.btn:hover {
 				background: #17A2B8;
 			}
 
+			.btn-secondary {
+				background: #107282;
+			}
+			
+			.btn-secondary:hover {
+				background: #107282;
+			}
+
+			.btn-square{
+				height: 70px;
+				min-width: 70px;
+			}
+
+			.slider {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 15px;
+				border-radius: 5px;  
+				background: #e5e5e5;
+				outline: none;
+				opacity: 0.7;
+				-webkit-transition: .2s;
+				transition: opacity .2s;
+			}
+
+			.slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 35px;
+				height: 35px;
+				border-radius: 50%; 
+				background: #17A2B8;
+				cursor: pointer;
+			}
+
+			.slider::-moz-range-thumb {
+				width: 35px;
+				height: 35px;
+				border-radius: 50%;
+				background: #17A2B8;
+				cursor: pointer;
+			}
 		</style>
 
 	</head>
@@ -45,17 +91,47 @@
 	<body class="py-4">
 		<div class="container">
 			<div>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickOn">ON</button><br>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickOff">OFF</button><br>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickBlink">BLINK TEST</button><br>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio1">MP3 TEST 1</button><br>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickAudio2">MP3 TEST 2</button><br>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickVideo">Video TEST</button><br>
-				<div id="videoCntrl" class="btn-group w-100" role="group" style="display:none;">
-					<button type="button" class="btn btn-info btn-lg mb-3" id="clickVideoPause">Pause Video</button><br>
-					<button type="button" class="btn btn-info btn-lg mb-3" id="clickVideoPlay">Resume Video</button><br>
+				<div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+					<label class="btn btn-info btn-lg active" id="clickOff">
+						<input type="radio" name="options" id="option1" autocomplete="off" checked> Humor OFF
+					</label>
+					<label class="btn btn-info btn-lg" id="clickOn">
+						<input type="radio" name="options" id="option2" autocomplete="off"> Humor ON
+					</label>
 				</div>
-				<button type="button" class="btn btn-info btn-lg w-100 mb-3" id="clickReload">Reload Screen</button><br>
+				<div class="w-100 controls rounded mt-3 text-center p-2">
+					<label class="h5 weight-normal text-light">Sound Board</label>
+					<div id="soundBoard" class="d-flex align-content-between flex-wrap">
+					</div>
+				</div>				
+				<div class="dropdown w-100 mt-3">
+					<button class="w-100 btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Play Video
+					</button>
+					<div id="videoList"  class="dropdown-menu w-100" aria-labelledby="dropdownMenu">						
+					</div>
+				</div>
+				<div id="videoCntrl" style="display:none;" class="controls p-3 rounded-bottom">
+					<div class="btn-group w-100" role="group">
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoPause"><i class="fas fa-pause"></i></button>
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoPlay"><i class="fas fa-play"></i></button>
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoStop"><i class="fas fa-stop"></i></button>
+					</div>			
+				</div>				
+				<div class="dropdown w-100 mt-3">
+					<button class="w-100 btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Play Music
+					</button>
+					<div class="dropdown-menu w-100" aria-labelledby="dropdownMenu" id="musicList"></div>
+				</div>
+				<div id="audioCntrl" style="display:none;" class="controls p-3 rounded-bottom">
+					<div class="btn-group w-100" role="group">
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioPause"><i class="fas fa-pause"></i></button>
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioPlay"><i class="fas fa-play"></i></button>
+						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioStop"><i class="fas fa-stop"></i></button>
+					</div>					
+				</div>
+				<button type="button" class="btn btn-info btn-lg w-100 mt-3" id="clickReload">Reload Screen</button>
 			</div>
 			
 			<!-- <center>
@@ -75,7 +151,8 @@
 		<script src="//cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-		
+		<script src="https://use.fontawesome.com/releases/v5.12.1/js/all.js" data-auto-replace-svg="nest"></script>
+
 		<script>
 			$(function() {
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
@@ -85,8 +162,56 @@
 				};
 
 				conn.onmessage = function(e) {
+					data = {};
+					if(isJson(e.data)){
+						data = JSON.parse(e.data);
+					}
 					console.log(e.data);
+					/* if(e.data == "reload"){
+						window.location.reload();
+					}else if(data.type){						
+						//objects go here
+					}else{
+						window.location.href = e.data;
+					} */
 				};
+
+
+				$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
+					$('#musicList').empty();
+					$('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">PLAY ALL</button>');
+					$.each(rd, function(index) {
+						result = rd[index];
+						$('#musicList').append('<div class="dropdown-divider"></div>');
+						$('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">'+result.replace(".mp3", "")+'</button>');
+					});
+				}, "json");
+				
+				$.get( "loadFiles.php?folder=mp3/&filter=*.mp3",{}, function(rd) {
+					$('#soundBoard').empty();
+					i=1;
+					$.each(rd, function(index) {
+						result = rd[index];
+						if(i>1){
+							$('#soundBoard').append('<div class="dropdown-divider"></div>');
+						}
+						$('#soundBoard').append('<button type="button" class="btn btn-info btn-square m-1 clickSoundPlay">'+result.replace(".mp3", "")+'</button>');
+						i++;
+					});
+				}, "json");
+
+				$.get( "loadFiles.php?folder=mp4/&filter=*.mp4",{}, function(rd) {
+					$('#videoList').empty();
+					i=1;
+					$.each(rd, function(index) {
+						result = rd[index];
+						if(i>1){
+							$('#videoList').append('<div class="dropdown-divider"></div>');
+						}
+						$('#videoList').append('<button class="dropdown-item btn-lg w-100 text-center clickVideoPlay" id="clickVideo" type="button">'+result.replace(".mp4", "")+'</button>');
+						i++;
+					});
+				}, "json");
 
 				$('#clickOn').on('click', function() {
 					$.get( "led_on.php",{}, function(rd) {
@@ -98,36 +223,67 @@
 						//alert("LED TURNED OFF");
 					}, "json");
 				});	
-				$('#clickBlink').on('click', function() {
-					$.get( "blink.php",{}, function(rd) {
-						//blink
-					}, "json");
-				});
-				$('#clickAudio1').on('click', function() {
-					$.get( "audio1.php",{}, function(rd) {
-						//mp3
-					}, "json");
-				});
-				$('#clickAudio2').on('click', function() {
-					$.get( "audio2.php",{}, function(rd) {
-						//mp3
-					}, "json");
-				});
-				$('#clickVideo').on('click', function() {
-					conn.send('videoPlayer.html');
-					$('#videoCntrl').show();
-				});
 				$('#clickVideoPause').on('click', function() {
-					conn.send('pause');
+					togglePause('#clickVideo', true);
+					conn.send('videoPause');
 				});
 				$('#clickVideoPlay').on('click', function() {
-					conn.send('play');
-				});				
-				$('#clickReload').on('click', function() {
-					conn.send('screen_left.html');
+					togglePause('#clickVideo', false);
+					conn.send('videoPlay');
+				});										
+				$('#clickReload, #clickVideoStop').on('click', function() {
+					conn.send('reload');
+					$('#clickOff').trigger('click');
+					$('#audioCntrl').hide();
 					$('#videoCntrl').hide();
-				});						
+				});	
+				
+				$('#videoList').on('click', '.clickVideoPlay', function() {
+					togglePause('#clickVideo', false);
+					conn.send(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
+					$('#videoCntrl').show();
+				});
+				$('#musicList').on('click', '.clickMusicPlay', function() {
+					togglePause('#clickAudio', false);
+					conn.send(JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
+					$('#audioCntrl').show();
+				});				
+				$('#soundBoard').on('click', '.clickSoundPlay', function() {
+					conn.send(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
+				});				
+				$('#clickAudioPause').on('click', function() {
+					togglePause('#clickAudio', true);
+					conn.send('audioPause');
+				});
+				$('#clickAudioPlay').on('click', function() {
+					togglePause('#clickAudio', false);
+					conn.send('audioPlay');
+				});
+				$('#clickAudioStop').on('click', function() {
+					conn.send('audioStop');
+					$('#audioCntrl').hide();
+				});	
+
+				$('#clickAudioPlay').hide();
+				$('#clickVideoPlay').hide();
+				
 			});
+
+			function togglePause(type, pause){
+				button1 = pause?type+"Pause":type+"Play";
+				button2 = pause?type+"Play":type+"Pause";
+				$(button1).hide();
+				$(button2).show();
+			}
+
+			function isJson(str) {
+				try {
+					JSON.parse(str);
+				} catch (e) {
+					return false;
+				}
+				return true;
+			}
 
 			/* function scaleanim() {
 				var randno;

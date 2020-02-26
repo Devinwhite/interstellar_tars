@@ -41,11 +41,25 @@
 				margin: 0 auto;
 				padding-top: 0px;
 			}
+			video {
+                left: 50%;
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
 		</style>
 		
 	</head>
 
 	<body>
+		
+		<audio autoplay id="audioSource">
+			<source id="mp3_src" type="audio/mpeg">
+		</audio>
+
+		<video id="videoSource" name="myMovie" width="800" autoplay loop>
+			<source id="mp4_src" type="video/mp4">
+		</video>
 
 		<div class="app__layout">
 			<div class="app__content">
@@ -65,7 +79,6 @@
 			var clearOld = 50000;
 			
 			$(function() {
-
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
             
 				conn.onopen = function(e) {
@@ -73,11 +86,36 @@
 				};
 
 				conn.onmessage = function(e) {
+					data = {};
+					if(isJson(e.data)){
+						data = JSON.parse(e.data);
+					}
+					
 					if(e.data == "reload"){
 						window.location.reload();
-					}else{
-						window.location.href = e.data;
+					}else if(e.data == "audioPause"){
+						$('#audioSource').trigger('pause');
+                    }else if(e.data == "audioPlay"){
+                        $('#audioSource').trigger('play');
+					}else if(e.data == "audioStop"){
+                        change_track("");
+					}else if(e.data == "videoPause"){
+						$('#videoSource').trigger('pause');
+                    }else if(e.data == "videoPlay"){
+                        $('#videoSource').trigger('play');
+					}else if(data.type){						
+						if(data.type == "audioLoad"){
+							change_track(data.value);		
+						}else if(data.type == "videoLoad"){
+							$("#terminal").html('');
+							$("#terminal").hide();
+							clearTyper();
+							change_video(data.value);		
+						}						
 					}
+					/* else{
+						window.location.href = e.data;
+					} */
 					console.log(e.data);
 				};
 
@@ -86,13 +124,22 @@
 					src = og_src;
 
 					startTyper();
-					
+
 					setTimeout(function() {
 						window.location.reload();
 					}, 3000000);
-				});			
+				});
+
 			});
 			
+			function isJson(str) {
+				try {
+					JSON.parse(str);
+				} catch (e) {
+					return false;
+				}
+				return true;
+			}
 
 			function typeNext(){
 				if(!isPaused && !isLongPaused){
@@ -187,6 +234,18 @@
 				speedInterval = setInterval(function(){
 					speed = getRandomInt(2,10);
 				}, 600);
+			}
+
+			function change_track(sourceUrl) {
+				$('#mp3_src').attr("src", sourceUrl);
+				$('#audioSource').trigger('pause');
+				$('#audioSource').trigger('load');
+			}
+
+			function change_video(sourceUrl) {
+				$('#mp4_src').attr("src", sourceUrl);
+				$('#videoSource').trigger('pause');
+				$('#videoSource').trigger('load');
 			}
 		
 			$('body').pressure({
