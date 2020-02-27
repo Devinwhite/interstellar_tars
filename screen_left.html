@@ -78,6 +78,7 @@
 			var isLongPaused = false;
 			var clearOld = 50000;
 			var humorSettings = [];
+			var videoPaused = false;
 
 			$(function() {
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
@@ -101,6 +102,7 @@
 					}else if(e.data == "audioStop"){
                         change_track("");
 					}else if(e.data == "videoPause"){
+						videoPaused = true;
 						$('#videoSource').trigger('pause');
                     }else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
@@ -109,6 +111,7 @@
 							change_track(data.value);		
 						}else if(data.type == "videoLoad"){
 							humorSettings = [];
+							videoPaused = false;
 							videoName = decodeURI(data.value);
 							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?sss='+create_UUID();
 							$.get( jsonFile, {}, function(rd) {
@@ -139,18 +142,22 @@
 				$("#videoSource").on("loadeddata", function(e) {
 					$.each(humorSettings, function(index) {
 						if(humorSettings[index].start){
-							setTimeout(function(){ 
-								$.get( "led_on.php",{}, function(rd) {
-									//alert("LED TURNED ON");
-								}, "json");
-								if(humorSettings[index].end > 0){
-									setTimeout(function(){ 
-										$.get( "led_off.php",{}, function(rd) {
-											//alert("LED TURNED OFF");
-										}, "json");
-									}, humorSettings[index].end-humorSettings[index].start);
+							setTimeout(function(isPaused){ 
+								if(!isPaused){
+									$.get( "led_on.php",{}, function(rd) {
+										//alert("LED TURNED ON");
+									}, "json");
 								}
-							}, humorSettings[index].start);	
+								if(humorSettings[index].end > 0){
+									setTimeout(function(isPaused){ 
+										if(!isPaused){
+											$.get( "led_off.php",{}, function(rd) {
+												//alert("LED TURNED OFF");
+											}, "json");
+										}
+									}, humorSettings[index].end-humorSettings[index].start, videoPaused);
+								}
+							}, humorSettings[index].start, videoPaused);	
 						}
 					});
 				});
