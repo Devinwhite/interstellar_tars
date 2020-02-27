@@ -57,7 +57,7 @@
 			<source id="mp3_src" type="audio/mpeg">
 		</audio>
 
-		<video id="videoSource" name="myMovie" width="800" autoplay loop>
+		<video id="videoSource" name="myMovie" width="800" autoplay>
 			<source id="mp4_src" type="video/mp4">
 		</video>
 
@@ -77,10 +77,11 @@
 			var isPaused = false;
 			var isLongPaused = false;
 			var clearOld = 50000;
-			
+			var humorSettings = [];
+
 			$(function() {
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
-            
+				
 				conn.onopen = function(e) {
 					console.log("Connection established!");
 				};
@@ -107,10 +108,15 @@
 						if(data.type == "audioLoad"){
 							change_track(data.value);		
 						}else if(data.type == "videoLoad"){
-							$("#terminal").html('');
-							$("#terminal").hide();
-							clearTyper();
-							change_video(data.value);		
+							humorSettings = [];
+							videoName = decodeURI(data.value);
+							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?sss='+create_UUID();
+							$.get( jsonFile, {}, function(rd) {
+								humorSettings = rd.humor;
+								loadVideo(data.value);
+							}, "json").fail(function() {
+								loadVideo(data.value);
+							});									
 						}						
 					}
 					/* else{
@@ -130,7 +136,49 @@
 					}, 3000000);
 				});
 
+				$("#videoSource").on("loadeddata", function(e) {
+					$.each(humorSettings, function(index) {
+						if(humorSettings[index].start){
+							setTimeout(function(){ 
+								$.get( "led_on.php",{}, function(rd) {
+									//alert("LED TURNED ON");
+								}, "json");
+								if(humorSettings[index].end > 0){
+									setTimeout(function(){ 
+										$.get( "led_off.php",{}, function(rd) {
+											//alert("LED TURNED OFF");
+										}, "json");
+									}, humorSettings[index].end-humorSettings[index].start);
+								}
+							}, humorSettings[index].start);	
+						}
+					});
+				});
+
+				$("#videoSource").on('ended',function() { 
+					$.get( "led_off.php",{}, function(rd) {
+						conn.send('videoDone');
+						window.location.reload();
+					}, "json");
+				});
 			});
+
+			function loadVideo(data){
+				$("#terminal").html('');
+				$("#terminal").hide();
+				clearTyper();
+				change_video(data);
+			}
+
+			function create_UUID(){
+				var dt = new Date().getTime();
+				var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = (dt + Math.random()*16)%16 | 0;
+					dt = Math.floor(dt/16);
+					return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+				});
+				return uuid;
+			}
 			
 			function isJson(str) {
 				try {

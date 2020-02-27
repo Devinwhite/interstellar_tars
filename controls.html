@@ -159,13 +159,11 @@
 						data = JSON.parse(e.data);
 					}
 					console.log(e.data);
-					/* if(e.data == "reload"){
-						window.location.reload();
+					if(e.data == "videoDone"){
+						$('#clickReload').trigger('click');
 					}else if(data.type){						
 						//objects go here
-					}else{
-						window.location.href = e.data;
-					} */
+					}
 				};
 
 
@@ -233,7 +231,7 @@
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					togglePause('#clickVideo', false);
 					conn.send(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
-					$('#videoCntrl').show();
+					$('#videoCntrl').show();				
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
 					togglePause('#clickAudio', false);
