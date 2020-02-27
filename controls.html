@@ -118,7 +118,7 @@
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPlay"><i class="fas fa-play"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoStop"><i class="fas fa-stop"></i></button>
 						</div>			
-					</div>				
+					</div>
 					<div class="dropdown w-100 mt-3">
 						<button class="w-100 btn btn-dark btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							Play Music
@@ -129,6 +129,8 @@
 						<div class="btn-group w-100" role="group">
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPause"><i class="fas fa-pause"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPlay"><i class="fas fa-play"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPrev"><i class="fas fa-backward"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioNext"><i class="fas fa-forward"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fas fa-stop"></i></button>
 						</div>					
 					</div>
@@ -169,7 +171,7 @@
 
 				$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
 					$('#musicList').empty();
-					/* $('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">PLAY ALL</button>'); */
+					$('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">PLAY ALL</button>');
 					$.each(rd, function(index) {
 						result = rd[index];
 						$('#musicList').append('<div class="dropdown-divider"></div>');
@@ -235,7 +237,15 @@
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
 					togglePause('#clickAudio', false);
-					conn.send(JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
+					if($(this).text() == "PLAY ALL"){
+						conn.send(JSON.stringify({type:"audioLoad", value:$(this).text()}));
+						$('#clickAudioPrev').show();
+						$('#clickAudioNext').show();
+					}else{
+						conn.send(JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
+						$('#clickAudioPrev').hide();
+						$('#clickAudioNext').hide();
+					}					
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
@@ -253,10 +263,12 @@
 					conn.send('audioStop');
 					$('#audioCntrl').hide();
 				});	
-
-				$('#clickAudioPlay').hide();
-				$('#clickVideoPlay').hide();
-				
+				$('#clickAudioPrev').on('click', function() {
+					conn.send('audioPrev');
+				});	
+				$('#clickAudioNext').on('click', function() {
+					conn.send('audioNext');
+				});	
 				$("#menu-toggle").click(function(e) {
 					e.preventDefault();
 					$("#wrapper").toggleClass("toggled");
@@ -283,6 +295,10 @@
 						});
 					}
 				});
+
+
+				$('#clickAudioPlay').hide();
+				$('#clickVideoPlay').hide();				
 			});
 
 			function togglePause(type, pause){

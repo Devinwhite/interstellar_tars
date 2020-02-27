@@ -79,7 +79,8 @@
 			var clearOld = 50000;
 			var humorSettings = [];
 			var videoPaused = false;
-
+			var playList = [];
+			var playListIndex = 0;
 			$(function() {
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
 				
@@ -106,9 +107,32 @@
 						$('#videoSource').trigger('pause');
                     }else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
+					}else if(e.data == "audioPrev"){
+						playListIndex--;
+						playListIndex--;
+						if(playListIndex < 0){
+							playListIndex = playList.length-1;
+						}						
+						console.log(playListIndex);
+                        $('#audioSource').trigger('ended');
+					}else if(e.data == "audioNext"){
+						if(playListIndex >= playList.length){
+							playListIndex = 0;
+						}
+                        $('#audioSource').trigger('ended');	
 					}else if(data.type){						
 						if(data.type == "audioLoad"){
-							change_track(data.value);		
+							if(data.value == "PLAY ALL"){
+								playList = [];
+								playListIndex = 0;
+								$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
+									playList = rd;
+									change_track("mp3/music/"+playList[0]);
+									playListIndex++;
+								}, "json");
+							}else{
+								change_track(data.value);
+							}									
 						}else if(data.type == "videoLoad"){
 							humorSettings = [];
 							videoPaused = false;
@@ -167,6 +191,16 @@
 						conn.send('videoDone');
 						window.location.reload();
 					}, "json");
+				});
+
+				$("#audioSource").on('ended',function() { 
+					if(playList.length > 0){
+						if(playListIndex > playList.length){
+							playListIndex = 0;
+						}
+						change_track("mp3/music/"+playList[playListIndex]);
+						playListIndex++;	
+					}
 				});
 			});
 
@@ -292,6 +326,7 @@
 			}
 
 			function change_track(sourceUrl) {
+				console.log(sourceUrl);
 				$('#mp3_src').attr("src", sourceUrl);
 				$('#audioSource').trigger('pause');
 				$('#audioSource').trigger('load');
