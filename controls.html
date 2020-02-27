@@ -151,6 +151,7 @@
 			
 				conn.onopen = function(e) {
 					console.log("Connection established!");
+					conn.send('reload');
 				};
 
 				conn.onmessage = function(e) {
@@ -281,7 +282,6 @@
 				$('#restart').on('click', function() {
 					if(confirm("You will need to refresh Screen Left after Reboot.  Are you Sure you want to restart?")){
 						$.get( "restart.php",{}, function(rd) {
-							conn.send('reload');
 							window.location.reload();
 						}, "json").fail(function() {
 							alert('Something Went Wrong!');
