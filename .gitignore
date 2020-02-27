@@ -1,6 +1,4 @@
 vendor/
 composer.lock
-# ignore files in folder foo
-mp4/*
-# but keep the folder
-!mp4/.keep
+mp3/
+mp4/

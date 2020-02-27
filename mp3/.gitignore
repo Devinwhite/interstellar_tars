@@ -1,4 +1,0 @@
-# ignore files in folder foo
-music/*
-# but keep the folder
-!music/.keep
