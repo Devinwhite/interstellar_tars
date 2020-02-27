@@ -1,7 +1,9 @@
 <?php
 	header('Content-Type: application/json');
-    
-    $output = shell_exec('git reset --hard origin/master');
-    
-    echo json_encode($output);
+
+    $output = shell_exec('sudo git reset --hard origin/master; sudo git clean -f -d');
+    $response = array( 
+        "response"=>$output); 
+
+    echo json_encode($response);
 ?>
