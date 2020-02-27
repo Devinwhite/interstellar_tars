@@ -270,13 +270,21 @@
 					$.get( "getUpdates.php",{}, function(rd) {
 						//alert("updates done");
 					}, "json");
+					if(confirm("This will updated ALL the TARS screen software. Are you sure you want to update?")){
+						$.get( "getUpdates.php",{}, function(rd) {
+							window.location.reload();
+						}, "json").fail(function() {
+							window.location.reload();
+						});
+					}
 				});	
 				$('#restart').on('click', function() {
 					if(confirm("You will need to refresh Screen Left after Reboot.  Are you Sure you want to restart?")){
 						$.get( "restart.php",{}, function(rd) {
+							conn.send('reload');
 							window.location.reload();
 						}, "json").fail(function() {
-							window.location.reload();
+							alert('Something Went Wrong!');
 						});
 					}
 				});
