@@ -53,6 +53,7 @@ amixer cset numid=3 1
 # reset to master git
 cd /var/www/html/tars
 git reset --hard origin/master
+sudo git clean -f -d;
 git pull
 
 

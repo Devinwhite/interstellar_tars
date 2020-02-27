@@ -169,7 +169,7 @@
 
 				$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
 					$('#musicList').empty();
-					$('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">PLAY ALL</button>');
+					/* $('#musicList').append('<button class="dropdown-item btn-lg w-100 text-center clickMusicPlay" type="button">PLAY ALL</button>'); */
 					$.each(rd, function(index) {
 						result = rd[index];
 						$('#musicList').append('<div class="dropdown-divider"></div>');
