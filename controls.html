@@ -1,48 +1,4 @@
-<!-- <!doctype html>
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>Tars Control Panel</title>
-		<link rel="icon" href="assets/fav.ico">
-
-		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-		<meta name="apple-mobile-web-app-title" content="Tars CTRL" />
-		
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<link rel="stylesheet" href="css/style.css">
-	</head>
-
-	<body>
-		<div class="d-flex" id="wrapper">
-			<div id="sidebar-wrapper">
-				
-			</div>
-			
-			<div id="page-content-wrapper">
-				<nav class="navbar navbar-expand-lg navbar-light navbar-bg-dark">
-					<div class="container-fluid">
-						<button type="button" id="sidebarCollapse" class="btn btn-outline-light">
-							<i class="fas fa-align-left"></i>
-						</button>
-						<h3 class="text-light">TARS CONTROLS</h3>
-						<div></div>
-					</div>
-				</nav>
-				
-			</div>
-		</div>
-
-
-	</body>
-</html>
-
- -->
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 	<head>
@@ -52,7 +8,7 @@
 		<link rel="icon" href="assets/fav.ico">
 
 		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="apple-mobile-web-app-title" content="Tars CTRL" />
@@ -65,7 +21,7 @@
 
 	</head>
 
-	<body>
+	<body ontouchstart="">
 
 		<div class="d-flex" id="wrapper">
 
@@ -76,25 +32,19 @@
 						<h6>Settings</h6>
 					</div>
 					<ul class="list-unstyled components">
-						<!-- <li>
-							<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
-							<ul class="collapse list-unstyled" id="homeSubmenu">
-								<li>
-									<a href="#">Home 1</a>
-								</li>
-								<li>
-									<a href="#">Home 2</a>
-								</li>
-								<li>
-									<a href="#">Home 3</a>
-								</li>
-							</ul>
-						</li> -->
-						<li>
-							<a href="#" id="getUpdates">Get Updates</a>
-						</li>
 						<li>
 							<a href="#" id="refreshControls">Refresh Controls</a>
+						</li>
+						<li>
+							<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Advanced</a>
+							<ul class="collapse list-unstyled" id="homeSubmenu">
+								<li>
+									<a href="#" id="getUpdates">Get Updates</a>
+								</li>
+								<li>
+									<a href="#" id="restart">Restart PI</a>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</nav>
@@ -321,7 +271,15 @@
 						//alert("updates done");
 					}, "json");
 				});	
-				
+				$('#restart').on('click', function() {
+					if(confirm("You will need to refresh Screen Left after Reboot.  Are you Sure you want to restart?")){
+						$.get( "restart.php",{}, function(rd) {
+							window.location.reload();
+						}, "json").fail(function() {
+							window.location.reload();
+						});
+					}
+				});
 			});
 
 			function togglePause(type, pause){
@@ -329,6 +287,8 @@
 				button2 = pause?type+"Play":type+"Pause";
 				$(button1).hide();
 				$(button2).show();
+				$(button1).removeClass("rounded-left");
+				$(button2).addClass("rounded-left");
 			}
 
 			function isJson(str) {

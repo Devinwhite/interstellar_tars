@@ -1,9 +1,7 @@
 <?php
 	header('Content-Type: application/json');
-	/* system("cd /var/www/html/tars");
-    system("git reset --hard origin/master");
-    system("git pull") */;
+    
+    $output = shell_exec('git reset --hard origin/master');
+    
+    echo json_encode($output);
 ?>
-{ 
-   "succcess":true
-}

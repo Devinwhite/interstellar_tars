@@ -54,3 +54,37 @@ amixer cset numid=3 1
 cd /var/www/html/tars
 git reset --hard origin/master
 git pull
+
+
+# network settings
+sudo nano /etc/dhcpcd.conf
+
+interface wlan0
+static ip_address=192.168.1.101
+static routers=192.168.1.1
+static domain_name_servers=8.8.8.8
+
+
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+network={
+        ssid="NETGEAR26-5G"
+        psk="modernpotato295"
+}
+
+
+nano /etc/sudoers
+
+# allow mp3
+ALL     ALL = NOPASSWD: /usr/bin/mpg123
+ALL     ALL = NOPASSWD: /usr/bin/omxplayer
+
+# allow reboot
+ALL     ALL = NOPASSWD: /sbin/shutdown
+ALL     ALL = NOPASSWD: /sbin/reboot
+
+# allow git
+ALL     ALL = NOPASSWD: /usr/bin/git
+
+# other stuff
+nano /etc/php/7.3/fpm/php.ini
+display_errors = On
