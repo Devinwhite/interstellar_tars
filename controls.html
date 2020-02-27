@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 
 <html lang="en">
 	<head>
@@ -13,141 +13,183 @@
 		<meta name="apple-mobile-web-app-title" content="Tars CTRL" />
 		
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		
-		<style>
-			body{
-				background: #3F5876;
-			}
-			
-			/* .bars-container {
-				overflow: hidden;
-				padding-top: 100px;
-				padding-bottom: 0px;
-			}
-			.bar {
-				width: 10px;
-				height: 40px;
-				background: #17A2B8;
-				border-radius: 0px;
-				transition: .1s linear;
-				display: inline-block;
-			} */
-
-			.controls {
-				background-color: rgba(0, 0, 0, 0.1)
-			}
-
-			.btn:hover {
-				background: #17A2B8;
-			}
-
-			.btn-secondary {
-				background: #107282;
-			}
-			
-			.btn-secondary:hover {
-				background: #107282;
-			}
-
-			.btn-square{
-				height: 70px;
-				min-width: 70px;
-			}
-
-			.slider {
-				-webkit-appearance: none;
-				width: 100%;
-				height: 15px;
-				border-radius: 5px;  
-				background: #e5e5e5;
-				outline: none;
-				opacity: 0.7;
-				-webkit-transition: .2s;
-				transition: opacity .2s;
-			}
-
-			.slider::-webkit-slider-thumb {
-				-webkit-appearance: none;
-				appearance: none;
-				width: 35px;
-				height: 35px;
-				border-radius: 50%; 
-				background: #17A2B8;
-				cursor: pointer;
-			}
-
-			.slider::-moz-range-thumb {
-				width: 35px;
-				height: 35px;
-				border-radius: 50%;
-				background: #17A2B8;
-				cursor: pointer;
-			}
-		</style>
-
+		<link rel="stylesheet" href="css/style.css">
 	</head>
-	
 
-	<body class="py-4">
-		<div class="container">
-			<div>
-				<div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-					<label class="btn btn-info btn-lg active" id="clickOff">
-						<input type="radio" name="options" id="option1" autocomplete="off" checked> Humor OFF
-					</label>
-					<label class="btn btn-info btn-lg" id="clickOn">
-						<input type="radio" name="options" id="option2" autocomplete="off"> Humor ON
-					</label>
-				</div>
-				<div class="w-100 controls rounded mt-3 text-center p-2">
-					<label class="h5 weight-normal text-light">Sound Board</label>
-					<div id="soundBoard" class="d-flex align-content-between flex-wrap">
-					</div>
-				</div>				
-				<div class="dropdown w-100 mt-3">
-					<button class="w-100 btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Play Video
-					</button>
-					<div id="videoList"  class="dropdown-menu w-100" aria-labelledby="dropdownMenu">						
-					</div>
-				</div>
-				<div id="videoCntrl" style="display:none;" class="controls p-3 rounded-bottom">
-					<div class="btn-group w-100" role="group">
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoPause"><i class="fas fa-pause"></i></button>
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoPlay"><i class="fas fa-play"></i></button>
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickVideoStop"><i class="fas fa-stop"></i></button>
-					</div>			
-				</div>				
-				<div class="dropdown w-100 mt-3">
-					<button class="w-100 btn btn-info btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Play Music
-					</button>
-					<div class="dropdown-menu w-100" aria-labelledby="dropdownMenu" id="musicList"></div>
-				</div>
-				<div id="audioCntrl" style="display:none;" class="controls p-3 rounded-bottom">
-					<div class="btn-group w-100" role="group">
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioPause"><i class="fas fa-pause"></i></button>
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioPlay"><i class="fas fa-play"></i></button>
-						<button type="button" class="btn btn-info btn-lg mt-3 btn-secondary" id="clickAudioStop"><i class="fas fa-stop"></i></button>
-					</div>					
-				</div>
-				<button type="button" class="btn btn-info btn-lg w-100 mt-3" id="clickReload">Reload Screen</button>
+	<body>
+		<div class="d-flex" id="wrapper">
+			<div id="sidebar-wrapper">
+				
 			</div>
 			
-			<!-- <center>
-				<div class="bars-container">
-					<div class="bar" id="bar"></div>
-					<div class="bar" id="bar2"></div>
-					<div class="bar" id="bar3"></div>
-					<div class="bar" id="bar4"></div>
-					<div class="bar" id="bar5"></div>
-					<div class="bar" id="bar6"></div>
-					<div class="bar" id="bar7"></div>
-					<div class="bar" id="bar8"></div>
-				</div>
-			</center> -->
+			<div id="page-content-wrapper">
+				<nav class="navbar navbar-expand-lg navbar-light navbar-bg-dark">
+					<div class="container-fluid">
+						<button type="button" id="sidebarCollapse" class="btn btn-outline-light">
+							<i class="fas fa-align-left"></i>
+						</button>
+						<h3 class="text-light">TARS CONTROLS</h3>
+						<div></div>
+					</div>
+				</nav>
+				
+			</div>
 		</div>
 
+
+	</body>
+</html>
+
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8">
+		<title>Tars Control Panel</title>
+		<link rel="icon" href="assets/fav.ico">
+
+		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Tars CTRL" />
+
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" href="css/style.css">
+
+	</head>
+
+	<body>
+
+		<div class="d-flex" id="wrapper">
+
+			<!-- Sidebar -->
+			<div id="sidebar-wrapper">
+				<nav id="sidebar">
+					<div class="sidebar-header">
+						<h6>Settings</h6>
+					</div>
+					<ul class="list-unstyled components">
+						<!-- <li>
+							<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+							<ul class="collapse list-unstyled" id="homeSubmenu">
+								<li>
+									<a href="#">Home 1</a>
+								</li>
+								<li>
+									<a href="#">Home 2</a>
+								</li>
+								<li>
+									<a href="#">Home 3</a>
+								</li>
+							</ul>
+						</li> -->
+						<li>
+							<a href="#" id="getUpdates">Get Updates</a>
+						</li>
+						<li>
+							<a href="#" id="refreshControls">Refresh Controls</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<!-- /#sidebar-wrapper -->
+
+			<!-- Page Content -->
+			<div id="page-content-wrapper">
+				<nav class="navbar navbar-light navbar-bg-dark">
+					
+						<button type="button" id="menu-toggle" class="btn btn-link text-dark">
+							<i class="fas fa-align-left"></i>
+						</button>
+						<h3 class="text-light">TARS CONTROLS</h3>
+						<button type="button" id="menu-toggle" class="btn btn-outline-dark invisible">
+							<i class="fas fa-align-left"></i>
+						</button>
+						<!-- <button class="navbar-toggler invisible" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button> -->
+
+						<!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+								<li class="nav-item active">
+								<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+								</li>
+								<li class="nav-item">
+								<a class="nav-link" href="#">Link</a>
+								</li>
+								<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Dropdown
+								</a>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+									<a class="dropdown-item" href="#">Action</a>
+									<a class="dropdown-item" href="#">Another action</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item" href="#">Something else here</a>
+								</div>
+								</li>
+							</ul>
+						</div> -->
+					
+				</nav>
+				
+				<!-- container-fluid -->
+				<div class="container py-4">
+					<div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+						<label class="btn btn-dark btn-lg active" id="clickOff">
+							<input type="radio" name="options" id="option1" autocomplete="off" checked> Humor OFF
+						</label>
+						<label class="btn btn-dark btn-lg" id="clickOn">
+							<input type="radio" name="options" id="option2" autocomplete="off"> Humor ON
+						</label>
+					</div>
+					<div class="w-100 controls rounded mt-3 text-center p-2">
+						<label class="h5 weight-normal text-light">Sound Board</label>
+						<div id="soundBoard" class="d-flex align-content-between flex-wrap">
+						</div>
+					</div>				
+					<div class="dropdown w-100 mt-3">
+						<button class="w-100 btn btn-dark btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Play Video
+						</button>
+						<div id="videoList"  class="dropdown-menu w-100" aria-labelledby="dropdownMenu">						
+						</div>
+					</div>
+					<div id="videoCntrl" style="display:none;" class="controls p-3 rounded-bottom">
+						<div class="btn-group w-100" role="group">
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPause"><i class="fas fa-pause"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPlay"><i class="fas fa-play"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoStop"><i class="fas fa-stop"></i></button>
+						</div>			
+					</div>				
+					<div class="dropdown w-100 mt-3">
+						<button class="w-100 btn btn-dark btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Play Music
+						</button>
+						<div class="dropdown-menu w-100" aria-labelledby="dropdownMenu" id="musicList"></div>
+					</div>
+					<div id="audioCntrl" style="display:none;" class="controls p-3 rounded-bottom">
+						<div class="btn-group w-100" role="group">
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPause"><i class="fas fa-pause"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPlay"><i class="fas fa-play"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fas fa-stop"></i></button>
+						</div>					
+					</div>
+					<button type="button" class="btn btn-dark btn-lg w-100 mt-3" id="clickReload">Reload Screen</button>
+				</div>
+			</div>
+			<!-- /#page-content-wrapper -->
+		</div>
+		<!-- /#wrapper -->
+
+		<!-- Bootstrap core JavaScript -->
 		<script src="//cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -156,7 +198,7 @@
 		<script>
 			$(function() {
 				var conn = new WebSocket('ws://'+location.hostname+':8080');
-            
+			
 				conn.onopen = function(e) {
 					console.log("Connection established!");
 				};
@@ -195,7 +237,7 @@
 						if(i>1){
 							$('#soundBoard').append('<div class="dropdown-divider"></div>');
 						}
-						$('#soundBoard').append('<button type="button" class="btn btn-info btn-square m-1 clickSoundPlay">'+result.replace(".mp3", "")+'</button>');
+						$('#soundBoard').append('<button type="button" class="btn btn-dark btn-square m-1 clickSoundPlay">'+result.replace(".mp3", "")+'</button>');
 						i++;
 					});
 				}, "json");
@@ -267,6 +309,19 @@
 				$('#clickAudioPlay').hide();
 				$('#clickVideoPlay').hide();
 				
+				$("#menu-toggle").click(function(e) {
+					e.preventDefault();
+					$("#wrapper").toggleClass("toggled");
+				});
+				$("#refreshControls").click(function(e) {
+					window.location.reload();
+				});
+				$('#getUpdates').on('click', function() {
+					$.get( "getUpdates.php",{}, function(rd) {
+						//alert("updates done");
+					}, "json");
+				});	
+				
 			});
 
 			function togglePause(type, pause){
@@ -285,73 +340,8 @@
 				return true;
 			}
 
-			/* function scaleanim() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim, 100);
-
-			function scaleanim2() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar2").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim2, 100);
-
-			function scaleanim3() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar3").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim3, 100);
-
-			function scaleanim4() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar4").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim4, 100);
-
-			function scaleanim5() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar5").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim5, 100);
-
-			function scaleanim6() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar6").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim6, 100);
-
-			function scaleanim7() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar7").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim7, 100);
-
-			function scaleanim8() {
-				var randno;
-				randno = Math.random() * (3 - 1.5 + 1.5) + 1.5;
-				document.getElementById("bar8").style.transform = "scaleY(" + randno + ")";
-			}
-
-			setInterval(scaleanim8, 100); */
 		</script>
-
 
 	</body>
 
 </html>
-
