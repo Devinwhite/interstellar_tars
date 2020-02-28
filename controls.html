@@ -92,6 +92,7 @@
 				
 				<!-- container-fluid -->
 				<div class="container py-4">
+					<div class="w-100 bg-light p-2 rounded mb-3" id="errorMessage" style="display: none;"></div>
 					<div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
 						<label class="btn btn-dark btn-lg active" id="clickOff">
 							<input type="radio" name="options" id="option1" autocomplete="off" checked> Humor OFF
@@ -109,13 +110,13 @@
 						<button class="w-100 btn btn-dark btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							Play Video
 						</button>
-						<div id="videoList"  class="dropdown-menu w-100" aria-labelledby="dropdownMenu">						
+						<div id="videoList"  class="dropdown-menu" aria-labelledby="dropdownMenu">						
 						</div>
 					</div>
 					<div id="videoCntrl" style="display:none;" class="controls p-3 rounded-bottom">
 						<div class="btn-group w-100" role="group">
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPause"><i class="fas fa-pause"></i></button>
-							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPlay"><i class="fas fa-play"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPlay" style="display: none;"><i class="fas fa-play"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoStop"><i class="fas fa-stop"></i></button>
 						</div>			
 					</div>
@@ -128,7 +129,7 @@
 					<div id="audioCntrl" style="display:none;" class="controls p-3 rounded-bottom">
 						<div class="btn-group w-100" role="group">
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPause"><i class="fas fa-pause"></i></button>
-							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPlay"><i class="fas fa-play"></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPlay" style="display: none;"><i class="fas fa-play"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPrev"><i class="fas fa-backward"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioNext"><i class="fas fa-forward"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fas fa-stop"></i></button>
@@ -155,6 +156,29 @@
 					console.log("Connection established!");
 				};
 
+				function sendMessage(ws, msg){
+					if(ws.readyState == WebSocket.OPEN){
+						ws.send(msg);
+					}else{
+						$('#errorMessage').show();
+						$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> No Connection Established</p>');
+					}
+				}
+
+				conn.onclose = function (event) {
+					$('#errorMessage').show();
+					$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> Connection Closed</p>');
+				};
+
+				conn.onerror = function(e) { 
+					$('#errorMessage').show();
+					if(e.data){
+						$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> '+e.data+'</p>');
+					}else{
+						$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> Connection Error</p>');
+					}
+				};
+
 				conn.onmessage = function(e) {
 					data = {};
 					if(isJson(e.data)){
@@ -162,12 +186,11 @@
 					}
 					console.log(e.data);
 					if(e.data == "videoDone"){
-						$('#clickReload').trigger('click');
+						reloadScreen();
 					}else if(data.type){						
 						//objects go here
 					}
 				};
-
 
 				$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
 					$('#musicList').empty();
@@ -206,68 +229,60 @@
 				}, "json");
 
 				$('#clickOn').on('click', function() {
-					$.get( "led_on.php",{}, function(rd) {
-						//alert("LED TURNED ON");
-					}, "json");
+					turnOnHumor();
 				});	
 				$('#clickOff').on('click', function() {
-					$.get( "led_off.php",{}, function(rd) {
-						//alert("LED TURNED OFF");
-					}, "json");
+					turnOffHumor();
 				});	
 				$('#clickVideoPause').on('click', function() {
 					togglePause('#clickVideo', true);
-					conn.send('videoPause');
+					sendMessage(conn,'videoPause');
 				});
 				$('#clickVideoPlay').on('click', function() {
 					togglePause('#clickVideo', false);
-					conn.send('videoPlay');
+					sendMessage(conn,'videoPlay');
 				});										
 				$('#clickReload, #clickVideoStop').on('click', function() {
-					conn.send('reload');
-					$('#clickOff').trigger('click');
-					$('#audioCntrl').hide();
-					$('#videoCntrl').hide();
+					reloadScreen();
 				});	
-				
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					togglePause('#clickVideo', false);
-					conn.send(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
+					sendMessage(conn,JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
 					$('#videoCntrl').show();				
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
 					togglePause('#clickAudio', false);
 					if($(this).text() == "PLAY ALL"){
-						conn.send(JSON.stringify({type:"audioLoad", value:$(this).text()}));
+						sendMessage(conn,JSON.stringify({type:"audioLoad", value:$(this).text()}));
 						$('#clickAudioPrev').show();
 						$('#clickAudioNext').show();
 					}else{
-						conn.send(JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
+						sendMessage(conn,JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
 						$('#clickAudioPrev').hide();
 						$('#clickAudioNext').hide();
 					}					
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
-					conn.send(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
+					sendMessage(conn,JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
 				});				
 				$('#clickAudioPause').on('click', function() {
 					togglePause('#clickAudio', true);
-					conn.send('audioPause');
+					sendMessage(conn,'audioPause');
 				});
 				$('#clickAudioPlay').on('click', function() {
 					togglePause('#clickAudio', false);
-					conn.send('audioPlay');
+					sendMessage(conn,'audioPlay');
 				});
 				$('#clickAudioStop').on('click', function() {
-					conn.send('audioStop');
+					sendMessage(conn,'audioStop');
 					$('#audioCntrl').hide();
 				});	
 				$('#clickAudioPrev').on('click', function() {
-					conn.send('audioPrev');
+					sendMessage(conn,'audioPrev');
 				});	
 				$('#clickAudioNext').on('click', function() {
-					conn.send('audioNext');
+					sendMessage(conn,'audioNext');
 				});	
 				$("#menu-toggle").click(function(e) {
 					e.preventDefault();
@@ -279,7 +294,7 @@
 				$('#getUpdates').on('click', function() {
 					if(confirm("This will updated ALL the TARS screen software. Are you sure you want to update?")){
 						$.get( "getUpdates.php",{}, function(rd) {
-							conn.send('reload');
+							sendMessage(conn,'reload');
 							window.location.reload();
 						}, "json").fail(function() {
 							alert('Something Went Wrong!');
@@ -296,19 +311,35 @@
 					}
 				});
 
+				function reloadScreen(){
+					sendMessage(conn,'reload');
+					turnOffHumor();
+					$('#audioCntrl').hide();
+					$('#videoCntrl').hide();
+				}
 
-				$('#clickAudioPlay').hide();
-				$('#clickVideoPlay').hide();				
+				function turnOffHumor(){
+					$.get( "led_off.php",{}, function(rd) {
+						//alert("LED TURNED OFF");
+					}, "json");
+				}
+
+				function turnOnHumor(){
+					$.get( "led_on.php",{}, function(rd) {
+						//alert("LED TURNED ON");
+					}, "json");
+				}
+
+				function togglePause(type, pause){
+					button1 = pause?type+"Pause":type+"Play";
+					button2 = pause?type+"Play":type+"Pause";
+					$(button1).hide();
+					$(button2).show();
+					$(button1).removeClass("rounded-left");
+					$(button2).addClass("rounded-left");
+				}
+			
 			});
-
-			function togglePause(type, pause){
-				button1 = pause?type+"Pause":type+"Play";
-				button2 = pause?type+"Play":type+"Pause";
-				$(button1).hide();
-				$(button2).show();
-				$(button1).removeClass("rounded-left");
-				$(button2).addClass("rounded-left");
-			}
 
 			function isJson(str) {
 				try {
