@@ -79,14 +79,57 @@
 			var clearOld = 50000;
 			var humorSettings = [];
 			var videoPaused = false;
+			var isDead = false;
 			var playList = [];
 			var playListIndex = 0;
+			var wsURI = 'ws://'+location.hostname+':8080';
+			var interval = null;
+			var pauseInterval = null;
+			var speedInterval = null;
+			var connectInterval = null;
+
 			$(function() {
-				var conn = new WebSocket('ws://'+location.hostname+':8080');
+				
+				var conn = new WebSocket(wsURI);
 				
 				conn.onopen = function(e) {
 					console.log("Connection established!");
+					$.get( "screen_left.txt",{}, function(rd) {
+						og_src = rd;
+						src = og_src;
+						startTyper();
+					});
+					connectInterval = setInterval(checkConnection, 10000);
 				};
+
+				conn.onerror = function(e) {
+					checkConnection();
+					clearInterval(connectInterval);
+				};
+
+				conn.onclose = function(e) {
+					checkConnection();
+					clearInterval(connectInterval);
+				};
+
+				function checkConnection(){
+					if(conn.readyState == WebSocket.OPEN){
+						/* connected */				
+					}else{
+						hideVideo();
+						clearTyper();
+						isDead = true;
+						src = "";
+						$('#terminal').html('');
+						$('#terminal').append("<br><br><span style='color:red; font-size:26pt'>** CONNECTION FAILED **</span><br><br>");
+						$('#terminal').append("<br><br><span style='color:red; font-size:26pt'>** CONNECTION FAILED **</span><br><br>");			
+						$('#terminal').append("<br><br><span style='color:red; font-size:26pt'>** CONNECTION FAILED **</span><br><br>");		
+						$('#terminal').append("<br><br><span style='color:red; font-size:26pt'>** CONNECTION FAILED **</span><br><br>");
+						setTimeout(function() {
+							window.location.reload();
+						}, 5000);		
+					}
+				}
 
 				conn.onmessage = function(e) {
 					data = {};
@@ -152,17 +195,6 @@
 					console.log(e.data);
 				};
 
-				$.get( "screen_left.txt",{}, function(rd) {
-					og_src = rd;
-					src = og_src;
-
-					startTyper();
-
-					/* setTimeout(function() {
-						window.location.reload();
-					}, 3000000); */
-				});
-
 				$("#videoSource").on("loadeddata", function(e) {
 					$.each(humorSettings, function(index) {
 						if(humorSettings[index].start){
@@ -211,6 +243,11 @@
 				change_video(data);
 			}
 
+			function hideVideo(){
+				$("#terminal").show();
+				change_video("");
+			}
+
 			function create_UUID(){
 				var dt = new Date().getTime();
 				var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -231,6 +268,8 @@
 			}
 
 			function typeNext(){
+				if(isDead) return;
+				
 				if(!isPaused && !isLongPaused){
 
 					//clear memory

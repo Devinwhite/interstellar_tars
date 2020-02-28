@@ -42,6 +42,9 @@
 									<a href="#" id="getUpdates">Get Updates</a>
 								</li>
 								<li>
+									<a href="#" id="logs">Show Log</a>
+								</li>
+								<li>
 									<a href="#" id="restart">Restart PI</a>
 								</li>
 							</ul>
@@ -149,29 +152,54 @@
 		<script src="https://use.fontawesome.com/releases/v5.12.1/js/all.js" data-auto-replace-svg="nest"></script>
 
 		<script>
+			var wsURI = 'ws://'+location.hostname+':8080';
 			$(function() {
-				var conn = new WebSocket('ws://'+location.hostname+':8080');
+				alert("test");
+
+				var conn = new WebSocket(wsURI);
 			
 				conn.onopen = function(e) {
+					$('#errorMessage').prepend('<p><span style="color: green;">SUCCESS:</span> New Connection</p>');
 					console.log("Connection established!");
 				};
 
-				function sendMessage(ws, msg){
-					if(ws.readyState == WebSocket.OPEN){
-						ws.send(msg);
+				function sendMessage(msg){
+					if(conn.readyState == WebSocket.OPEN){
+						conn.send(msg);
 					}else{
-						$('#errorMessage').show();
-						$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> No Connection Established</p>');
+						setTimeout(function(){
+							if(conn.readyState == WebSocket.OPEN){
+								$('#errorMessage').prepend('<p><span style="color: green;">SUCCESS:</span> Established Connection</p>');
+								//resend
+								$('#errorMessage').hide();
+								conn.send(msg);
+							}else{
+								$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> No Connection Established</p>');
+								if(confirm("Connetion Lost.\nWould you like to try and reconnect?")){
+									setTimeout(function() {
+										if(conn.readyState == WebSocket.OPEN){
+											$('#errorMessage').prepend('<p><span style="color: green;">SUCCESS:</span> New Connection</p>');
+											$('#errorMessage').hide();
+											alert("Connection Restored.");
+										}else{
+											alert("Connection Failed.");
+										}
+									}, 2000);		
+									conn = new WebSocket(wsURI);						
+								}else{
+									$('#errorMessage').show();
+								}
+							}
+						},1000);
+						conn = new WebSocket(wsURI);						
 					}
 				}
 
-				conn.onclose = function (event) {
-					$('#errorMessage').show();
+				conn.onclose = function (e) {
 					$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> Connection Closed</p>');
 				};
 
 				conn.onerror = function(e) { 
-					$('#errorMessage').show();
 					if(e.data){
 						$('#errorMessage').prepend('<p><span style="color: red;">ERROR:</span> '+e.data+'</p>');
 					}else{
@@ -236,53 +264,53 @@
 				});	
 				$('#clickVideoPause').on('click', function() {
 					togglePause('#clickVideo', true);
-					sendMessage(conn,'videoPause');
+					sendMessage('videoPause');
 				});
 				$('#clickVideoPlay').on('click', function() {
 					togglePause('#clickVideo', false);
-					sendMessage(conn,'videoPlay');
+					sendMessage('videoPlay');
 				});										
 				$('#clickReload, #clickVideoStop').on('click', function() {
 					reloadScreen();
 				});	
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					togglePause('#clickVideo', false);
-					sendMessage(conn,JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
+					sendMessage(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
 					$('#videoCntrl').show();				
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
 					togglePause('#clickAudio', false);
 					if($(this).text() == "PLAY ALL"){
-						sendMessage(conn,JSON.stringify({type:"audioLoad", value:$(this).text()}));
+						sendMessage(JSON.stringify({type:"audioLoad", value:$(this).text()}));
 						$('#clickAudioPrev').show();
 						$('#clickAudioNext').show();
 					}else{
-						sendMessage(conn,JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
+						sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/music/"+$(this).text()+".mp3"}));
 						$('#clickAudioPrev').hide();
 						$('#clickAudioNext').hide();
 					}					
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
-					sendMessage(conn,JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
+					sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
 				});				
 				$('#clickAudioPause').on('click', function() {
 					togglePause('#clickAudio', true);
-					sendMessage(conn,'audioPause');
+					sendMessage('audioPause');
 				});
 				$('#clickAudioPlay').on('click', function() {
 					togglePause('#clickAudio', false);
-					sendMessage(conn,'audioPlay');
+					sendMessage('audioPlay');
 				});
 				$('#clickAudioStop').on('click', function() {
-					sendMessage(conn,'audioStop');
+					sendMessage('audioStop');
 					$('#audioCntrl').hide();
 				});	
 				$('#clickAudioPrev').on('click', function() {
-					sendMessage(conn,'audioPrev');
+					sendMessage('audioPrev');
 				});	
 				$('#clickAudioNext').on('click', function() {
-					sendMessage(conn,'audioNext');
+					sendMessage('audioNext');
 				});	
 				$("#menu-toggle").click(function(e) {
 					e.preventDefault();
@@ -294,7 +322,7 @@
 				$('#getUpdates').on('click', function() {
 					if(confirm("This will updated ALL the TARS screen software. Are you sure you want to update?")){
 						$.get( "getUpdates.php",{}, function(rd) {
-							sendMessage(conn,'reload');
+							sendMessage('reload');
 							window.location.reload();
 						}, "json").fail(function() {
 							alert('Something Went Wrong!');
@@ -310,9 +338,15 @@
 						});
 					}
 				});
-
+				$('#logs').on('click', function() {
+					if ($('#errorMessage').contents().length == 0){
+						alert("No Errors Reported");
+					}else{
+						$('#errorMessage').show();
+					}			
+				});				
 				function reloadScreen(){
-					sendMessage(conn,'reload');
+					sendMessage('reload');
 					turnOffHumor();
 					$('#audioCntrl').hide();
 					$('#videoCntrl').hide();
@@ -339,7 +373,11 @@
 					$(button2).addClass("rounded-left");
 				}
 			
+				$('.btn').removeClass('hover');
+				$('.btn').removeClass('hoverCssClass');
 			});
+
+			
 
 			function isJson(str) {
 				try {
