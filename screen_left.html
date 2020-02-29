@@ -171,6 +171,7 @@
 						audioPaused = true;
 						$('#audioSource').trigger('pause');
                     }else if(e.data == "audioPlay"){
+						audioPaused = false;
                         $('#audioSource').trigger('play');
 					}else if(e.data == "audioStop"){
 						audioPaused = true;
@@ -182,6 +183,7 @@
 						videoPaused = true;
 						$('#videoSource').trigger('pause');
 					}else if(e.data == "videoPlay"){
+						videoPaused = false;
                         $('#videoSource').trigger('play');
 					}else if(e.data == "videoStop"){
 						videoPaused = true;
