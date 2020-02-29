@@ -173,6 +173,9 @@
                     }else if(e.data == "audioPlay"){
                         $('#audioSource').trigger('play');
 					}else if(e.data == "audioStop"){
+						if(audioPaused){
+							return;
+						}
 						audioPaused = true;
                         change_track("mp3/music/"+currentAudioTrack+".mp3",true);
 					}else if(e.data == "audioEject"){
@@ -183,6 +186,9 @@
 					}else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
 					}else if(e.data == "videoStop"){
+						if(videoPaused){
+							return;
+						}
 						videoPaused = true;
 						$('#videoSource').trigger('pause');
 						$('#videoSource').get(0).currentTime = 0;
