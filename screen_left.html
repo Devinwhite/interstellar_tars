@@ -174,8 +174,9 @@
                         $('#audioSource').trigger('play');
 					}else if(e.data == "audioStop"){
 						audioPaused = true;
-                        change_track("mp3/music/"+currentAudioTrack+".mp3",true);
-					}else if(e.data == "audioEject"){
+						$('#audioSource').trigger('pause');
+						$('#audioSource').get(0).currentTime = 0;
+                    }else if(e.data == "audioEject"){
                         change_track("");
 					}else if(e.data == "videoPause"){
 						videoPaused = true;
