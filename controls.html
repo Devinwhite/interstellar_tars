@@ -316,11 +316,19 @@
 					sendMessage('videoStop');
 				});	
 				$('#videoList').on('click', '.clickVideoPlay', function() {
+					if($('#audioCntrl').css('display') != 'none'){
+						alert("Please Eject Music First");
+						return;
+					}
 					togglePause('#clickVideo', false);
 					sendMessage(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
 					$('#videoCntrl').show();				
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
+					if($('#videoCntrl').css('display') != 'none'){
+						alert("Please Eject Video First");
+						return;
+					}
 					togglePause('#clickAudio', false);
 					if($(this).text() == "PLAY ALL"){
 						sendMessage(JSON.stringify({type:"audioLoad", value:$(this).text()}));
@@ -334,8 +342,14 @@
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
-					$('#audioCntrl').hide();
-					$('#videoCntrl').hide();
+					if($('#audioCntrl').css('display') != 'none'){
+						alert("Please Eject Music First");
+						return;
+					}
+					if($('#videoCntrl').css('display') != 'none'){
+						alert("Please Eject Video First");
+						return;
+					}
 					sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3", soundBoard:true}));
 				});				
 				$('#clickAudioPause').on('click', function() {

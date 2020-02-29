@@ -305,24 +305,28 @@
 				}
 				
 				function change_track(sourceUrl,autoPause) {
+					$('#audioSource').trigger('pause');
 					$('#mp3_src').attr("src", sourceUrl);
 					$('#audioSource').trigger('pause');
 					$('#audioSource').trigger('load');
 					if(autoPause){
 						$('#audioSource').trigger('pause');
 					}
-					try {
-						currentAudioTrack = sourceUrl.replace("mp3/music/","");
-						currentAudioTrack = currentAudioTrack.replace(".mp3","");
-						audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
-						conn.send(audioTrackMsg);
-					}
-					catch(err) {
-						console.log(err.message);
+					if(!soundBoard){
+						try {
+							currentAudioTrack = sourceUrl.replace("mp3/music/","");
+							currentAudioTrack = currentAudioTrack.replace(".mp3","");
+							audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
+							conn.send(audioTrackMsg);
+						}
+						catch(err) {
+							console.log(err.message);
+						}
 					}
 				}
 
 				function change_video(sourceUrl,autoPause) {
+					$('#videoSource').trigger('pause');
 					$('#mp4_src').attr("src", sourceUrl);
 					$('#videoSource').trigger('pause');
 					$('#videoSource').trigger('load');
