@@ -161,21 +161,23 @@
                     }else if(e.data == "audioPlay"){
                         $('#audioSource').trigger('play');
 					}else if(e.data == "audioStop"){
+						audioPaused = true;
+                        change_track("mp3/music/"+currentAudioTrack+".mp3",true);
+					}else if(e.data == "audioEject"){
                         change_track("");
 					}else if(e.data == "videoPause"){
 						videoPaused = true;
-						$.each(humorStartTimeout, function(index) {
-							clearTimeout(humorStartTimeout[index]);
-						});
-						$.each(humorEndTimeout, function(index) {
-							clearTimeout(humorEndTimeout[index]);
-						});
+						clearHumor();
 						$.get( "led_off.php",{}, function(rd) {
 							//alert("LED TURNED OFF");
 						}, "json");
 						$('#videoSource').trigger('pause');
                     }else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
+					}else if(e.data == "videoStop"){
+						videoPaused = true;
+						clearHumor();
+                        change_video("mp4/"+currentVideoTrack+".mp4",true);
 					}else if(e.data == "audioPrev"){
 						audioPaused = false;
 						playListIndex--;
@@ -217,7 +219,7 @@
 							humorSettings = [];
 							videoPaused = false;
 							videoName = decodeURI(data.value);
-							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?sss='+create_UUID();
+							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?uid='+create_UUID();
 							$.get( jsonFile, {}, function(rd) {
 								humorSettings = rd.humor;
 								loadVideo(data.value);
@@ -232,23 +234,25 @@
 					console.log(e.data);
 				};
 
-				$("#videoSource").on("loadeddata", function(e) {
-					$.each(humorSettings, function(index) {
-						if(humorSettings[index].start){
-							humorStartTimeout[index] = setTimeout(function(isPaused){ 
-								$.get( "led_on.php",{}, function(rd) {
-									//alert("LED TURNED ON");
-								}, "json");
-								if(humorSettings[index].end > 0){
-									humorEndTimeout[index] = setTimeout(function(){ 
-										$.get( "led_off.php",{}, function(rd) {
-											//alert("LED TURNED OFF");
-										}, "json");
-									}, humorSettings[index].end-humorSettings[index].start);
-								}
-							}, humorSettings[index].start);	
-						}
-					});
+				$("#videoSource").on("play", function(e) {
+					if($("#videoSource").get(0).currentTime == 0){
+						$.each(humorSettings, function(index) {
+							if(humorSettings[index].start){
+								humorStartTimeout[index] = setTimeout(function(){ 
+									$.get( "led_on.php",{}, function(rd) {
+										//alert("LED TURNED ON");
+									}, "json");
+									if(humorSettings[index].end > 0){
+										humorEndTimeout[index] = setTimeout(function(){ 
+											$.get( "led_off.php",{}, function(rd) {
+												//alert("LED TURNED OFF");
+											}, "json");
+										}, humorSettings[index].end-humorSettings[index].start);
+									}
+								}, humorSettings[index].start);	
+							}
+						});
+					}
 				});
 
 				$("#videoSource").on('ended',function() { 
@@ -268,15 +272,27 @@
 					}
 				});
 
+				function clearHumor(){
+					$.each(humorStartTimeout, function(index) {
+						clearTimeout(humorStartTimeout[index]);
+					});
+					$.each(humorEndTimeout, function(index) {
+						clearTimeout(humorEndTimeout[index]);
+					});
+				}
+
 				function resetPlayList(){
 					playList = [];
 					playListIndex = 0;
 				}
 				
-				function change_track(sourceUrl) {
+				function change_track(sourceUrl,autoPause) {
 					$('#mp3_src').attr("src", sourceUrl);
 					$('#audioSource').trigger('pause');
 					$('#audioSource').trigger('load');
+					if(autoPause){
+						$('#audioSource').trigger('pause');
+					}
 					try {
 						currentAudioTrack = sourceUrl.replace("mp3/music/","");
 						currentAudioTrack = currentAudioTrack.replace(".mp3","");
@@ -288,10 +304,13 @@
 					}
 				}
 
-				function change_video(sourceUrl) {
+				function change_video(sourceUrl,autoPause) {
 					$('#mp4_src').attr("src", sourceUrl);
 					$('#videoSource').trigger('pause');
 					$('#videoSource').trigger('load');
+					if(autoPause){
+						$('#videoSource').trigger('pause');
+					}
 					try {
 						currentVideoTrack = sourceUrl.replace("mp4/","");
 						currentVideoTrack = currentVideoTrack.replace(".mp4","");

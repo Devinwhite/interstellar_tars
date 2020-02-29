@@ -130,9 +130,10 @@
 							<h5 id="videoTrack"></h5>
 						</div>
 						<div class="btn-group w-100" role="group">
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoStop"><i class="fas fa-stop"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPause"><i class="fas fa-pause"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoPlay" style="display: none;"><i class="fas fa-play"></i></button>
-							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoStop"><i class="fa fa-eject"></i></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickVideoEject"><i class="fa fa-eject"></i></button>							
 						</div>			
 					</div>
 					<div class="dropdown w-100 mt-3">
@@ -146,11 +147,12 @@
 							<h5 id="audioTrack"></h5>
 						</div>
 						<div class="btn-group w-100" role="group">
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fas fa-stop"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPause"><i class="fas fa-pause"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPlay" style="display: none;"><i class="fas fa-play"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioPrev" style="display: none;"><i class="fas fa-backward"></i></button>
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioNext" style="display: none;"><i class="fas fa-forward"></i></button>
-							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fa fa-eject"></i></i></button>
+							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioEject"><i class="fa fa-eject"></i></button>
 						</div>					
 					</div>
 				</div>
@@ -234,7 +236,7 @@
 								$('#videoTrack').text(data.videoTrack);
 								$('#videoCntrl').show();
 								togglePause('#clickVideo', data.videoPaused);								
-							}else if(data.task.toLowerCase().includes("audio") && data.task != "audioStop" && !data.soundBoard){
+							}else if(data.task.toLowerCase().includes("audio") && data.task != "audioEject" && !data.soundBoard){
 								if(data.playAll){
 									$('#audioTrack').text(data.audioTrack);
 									$('#audioCntrl').show();
@@ -305,9 +307,13 @@
 					togglePause('#clickVideo', false);
 					sendMessage('videoPlay');
 				});										
-				$('#clickReload, #clickVideoStop').on('click', function() {
+				$('#clickReload, #clickVideoEject').on('click', function() {
 					//$('#loaderModal').modal('show');
 					reloadScreen();
+				});
+				$('#clickVideoStop').on('click', function() {
+					togglePause('#clickVideo', true);
+					sendMessage('videoStop');
 				});	
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					togglePause('#clickVideo', false);
@@ -341,9 +347,13 @@
 					sendMessage('audioPlay');
 				});
 				$('#clickAudioStop').on('click', function() {
+					togglePause('#clickAudio', true);
 					sendMessage('audioStop');
-					$('#audioCntrl').hide();
 				});	
+				$('#clickAudioEject').on('click', function() {
+					sendMessage('audioEject');
+					$('#audioCntrl').hide();
+				});
 				$('#clickAudioPrev').on('click', function() {
 					togglePause('#clickAudio', false);
 					sendMessage('audioPrev');
@@ -413,8 +423,8 @@
 					button2 = pause?type+"Play":type+"Pause";
 					$(button1).hide();
 					$(button2).show();
-					$(button1).removeClass("rounded-left");
-					$(button2).addClass("rounded-left");
+					//$(button1).removeClass("rounded-left");
+					//$(button2).addClass("rounded-left");
 				}
 			
 				$('.btn').removeClass('hover');
