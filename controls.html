@@ -17,11 +17,17 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 		<!-- Custom styles for this template -->
-		<link rel="stylesheet" href="css/style.css?v=1.0.0">
+		<link rel="stylesheet" href="css/style.css?v=1.0.3">
 
 	</head>
 
 	<body ontouchstart="">
+
+		<div class="modal" tabindex="-1" role="dialog" id="loaderModal" data-backdrop="static" data-keyboard="false">
+			<div class="h-100 d-flex align-items-center justify-content-center">
+				<div class="loader"></div>
+			</div>
+		</div>
 
 		<div class="d-flex" id="wrapper">
 
@@ -62,8 +68,8 @@
 							<i class="fas fa-align-left"></i>
 						</button>
 						<h3 class="text-light">TARS CONTROLS</h3>
-						<button type="button" id="menu-toggle" class="btn btn-outline-dark invisible">
-							<i class="fas fa-align-left"></i>
+						<button type="button" id="ctr-refresh" class="btn btn-link text-dark">
+							<i class="fas fa-sync"></i>
 						</button>
 						<!-- <button class="navbar-toggler invisible" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 							<span class="navbar-toggler-icon"></span>
@@ -144,7 +150,7 @@
 							<button type="button" class="btn btn-dark btn-lg mt-3" id="clickAudioStop"><i class="fas fa-stop"></i></button>
 						</div>					
 					</div>
-					<button type="button" class="btn btn-dark btn-lg w-100 mt-3" id="clickReload">Reload Screen</button>
+					<!-- <button type="button" class="btn btn-dark btn-lg w-100 mt-3" id="clickReload">Reload Screen</button> -->
 				</div>
 			</div>
 			<!-- /#page-content-wrapper -->
@@ -226,7 +232,7 @@
 								$('#videoTrack').text(data.videoTrack);
 								$('#videoCntrl').show();
 								togglePause('#clickVideo', data.videoPaused);								
-							}else if(data.task.toLowerCase().includes("audio") && data.task != "audioStop"){
+							}else if(data.task.toLowerCase().includes("audio") && data.task != "audioStop" && !data.soundBoard){
 								if(data.playAll){
 									$('#audioTrack').text(data.audioTrack);
 									$('#audioCntrl').show();
@@ -298,6 +304,7 @@
 					sendMessage('videoPlay');
 				});										
 				$('#clickReload, #clickVideoStop').on('click', function() {
+					//$('#loaderModal').modal('show');
 					reloadScreen();
 				});	
 				$('#videoList').on('click', '.clickVideoPlay', function() {
@@ -319,7 +326,9 @@
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
-					sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3"}));
+					$('#audioCntrl').hide();
+					$('#videoCntrl').hide();
+					sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3", soundBoard:true}));
 				});				
 				$('#clickAudioPause').on('click', function() {
 					togglePause('#clickAudio', true);
@@ -346,6 +355,10 @@
 					$("#wrapper").toggleClass("toggled");
 				});
 				$("#refreshControls").click(function(e) {
+					window.location.reload();
+				});
+				$("#ctr-refresh").click(function(e) {
+					reloadScreen();
 					window.location.reload();
 				});
 				$('#getUpdates').on('click', function() {

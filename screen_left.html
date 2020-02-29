@@ -95,6 +95,7 @@
 			var playAll = false;
 			var humorStartTimeout = [];
 			var humorEndTimeout = [];
+			var soundBoard = false;
 
 			$(function() {
 				
@@ -153,7 +154,7 @@
 					if(e.data == "reload"){
 						window.location.reload();
 					}else if(e.data == "status"){
-						conn.send(JSON.stringify({type:"screenStatus", task:currentTask, value:currentValue, audioPaused:audioPaused, videoPaused:videoPaused, videoTrack:currentVideoTrack, audioTrack:currentAudioTrack, playAll:playAll}));
+						conn.send(JSON.stringify({type:"screenStatus", task:currentTask, value:currentValue, audioPaused:audioPaused, videoPaused:videoPaused, videoTrack:currentVideoTrack, audioTrack:currentAudioTrack, playAll:playAll, soundBoard:soundBoard}));
                     }else if(e.data == "audioPause"){
 						audioPaused = true;
 						$('#audioSource').trigger('pause');
@@ -193,6 +194,11 @@
 					}else if(data.type){						
 						if(data.type == "audioLoad"){
 							audioPaused = false;
+							if(data.soundBoard){
+								soundBoard = true;
+							}else{
+								soundBoard = false;
+							}
 							if(data.value == "PLAY ALL"){
 								playAll = true;
 								playList = [];
@@ -203,6 +209,7 @@
 									playListIndex++;
 								}, "json");
 							}else{
+								resetPlayList();
 								playAll = false;
 								change_track(data.value);
 							}									
@@ -260,6 +267,11 @@
 						playListIndex++;	
 					}
 				});
+
+				function resetPlayList(){
+					playList = [];
+					playListIndex = 0;
+				}
 				
 				function change_track(sourceUrl) {
 					$('#mp3_src').attr("src", sourceUrl);
