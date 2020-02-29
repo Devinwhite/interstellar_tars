@@ -63,6 +63,8 @@
 
 		<div class="app__layout">
 			<div class="app__content">
+				<!-- <button type="button" id="prev">Prev</button>
+				<button type="button" id="next">NEXT</button> -->
 				<div id="terminal"></div>
 			</div>
 		</div>
@@ -88,16 +90,26 @@
 			var pauseInterval = null;
 			var speedInterval = null;
 			var connectInterval = null;
+			var playInterval = null;
 			var currentTask = "";
 			var currentValue = "";
 			var currentAudioTrack = "";
 			var currentVideoTrack = "";
 			var playAll = false;
-			var humorStartTimeout = [];
-			var humorEndTimeout = [];
 			var soundBoard = false;
+			var startTimes = {};
+			var endTimes = {};
 
 			$(function() {
+				
+				/* $('#prev').on('click', function() {
+					$("#videoSource").get(0).currentTime = $("#videoSource").get(0).currentTime-.05;
+					console.log(Math.ceil(Math.floor($("#videoSource").get(0).currentTime*1000/50)*50));
+				});	
+				$('#next').on('click', function() {
+					$("#videoSource").get(0).currentTime = $("#videoSource").get(0).currentTime+.05;
+					console.log( Math.ceil(Math.floor($("#videoSource").get(0).currentTime*1000/50)*50));
+				});	 */
 				
 				var conn = new WebSocket(wsURI);
 				
@@ -167,17 +179,13 @@
                         change_track("");
 					}else if(e.data == "videoPause"){
 						videoPaused = true;
-						clearHumor();
-						$.get( "led_off.php",{}, function(rd) {
-							//alert("LED TURNED OFF");
-						}, "json");
 						$('#videoSource').trigger('pause');
-                    }else if(e.data == "videoPlay"){
+					}else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
 					}else if(e.data == "videoStop"){
 						videoPaused = true;
-						clearHumor();
-                        change_video("mp4/"+currentVideoTrack+".mp4",true);
+						$('#videoSource').trigger('pause');
+						$('#videoSource').get(0).currentTime = 0;
 					}else if(e.data == "audioPrev"){
 						audioPaused = false;
 						playListIndex--;
@@ -185,8 +193,7 @@
 						if(playListIndex < 0){
 							playListIndex = playList.length-1;
 						}						
-						console.log(playListIndex);
-                        $('#audioSource').trigger('ended');
+						$('#audioSource').trigger('ended');
 					}else if(e.data == "audioNext"){
 						audioPaused = false;
 						if(playListIndex >= playList.length){
@@ -222,6 +229,10 @@
 							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?uid='+create_UUID();
 							$.get( jsonFile, {}, function(rd) {
 								humorSettings = rd.humor;
+								$.each(humorSettings, function(index) {
+									startTimes[humorSettings[index].start] = true;
+									endTimes[humorSettings[index].end] = true;
+								});
 								loadVideo(data.value);
 							}, "json").fail(function() {
 								loadVideo(data.value);
@@ -235,25 +246,38 @@
 				};
 
 				$("#videoSource").on("play", function(e) {
-					if($("#videoSource").get(0).currentTime == 0){
-						$.each(humorSettings, function(index) {
-							if(humorSettings[index].start){
-								humorStartTimeout[index] = setTimeout(function(){ 
-									$.get( "led_on.php",{}, function(rd) {
-										//alert("LED TURNED ON");
-									}, "json");
-									if(humorSettings[index].end > 0){
-										humorEndTimeout[index] = setTimeout(function(){ 
-											$.get( "led_off.php",{}, function(rd) {
-												//alert("LED TURNED OFF");
-											}, "json");
-										}, humorSettings[index].end-humorSettings[index].start);
-									}
-								}, humorSettings[index].start);	
-							}
-						});
-					}
+					clearInterval(playInterval);
+					playInterval = setInterval(humorTimeCheck, 50);
 				});
+
+				$("#videoSource").on("pause", function(e) {
+					clearInterval(playInterval);
+					var curTime = Math.ceil(Math.floor($("#videoSource").get(0).currentTime*1000/100)*100);
+					$.each(humorSettings, function(index) {
+						if(humorSettings[index].start > curTime){
+							startTimes[humorSettings[index].start] = true;
+						}
+						if(humorSettings[index].end > curTime){
+							endTimes[humorSettings[index].end] = true;
+						}
+					});
+				});
+				
+				function humorTimeCheck(){
+					var curTime = Math.ceil(Math.floor($("#videoSource").get(0).currentTime*1000/100)*100);
+					if(startTimes[curTime]){
+						startTimes[curTime] = false;
+						$.get( "led_on.php",{}, function(rd) {
+							//alert("LED TURNED ON");
+						}, "json");
+					}
+					if(endTimes[curTime]){
+						endTimes[curTime] = false;
+						$.get( "led_off.php",{}, function(rd) {
+							//alert("LED TURNED OFF");
+						}, "json");
+					}
+				}				 
 
 				$("#videoSource").on('ended',function() { 
 					$.get( "led_off.php",{}, function(rd) {
@@ -271,15 +295,6 @@
 						playListIndex++;	
 					}
 				});
-
-				function clearHumor(){
-					$.each(humorStartTimeout, function(index) {
-						clearTimeout(humorStartTimeout[index]);
-					});
-					$.each(humorEndTimeout, function(index) {
-						clearTimeout(humorEndTimeout[index]);
-					});
-				}
 
 				function resetPlayList(){
 					playList = [];
