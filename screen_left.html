@@ -57,7 +57,7 @@
 			<source id="mp3_src" type="audio/mpeg">
 		</audio>
 
-		<video id="videoSource" name="myMovie" width="800" autoplay>
+		<video id="videoSource" name="myMovie" width="920" autoplay style="margin-left: 7px;">
 			<source id="mp4_src" type="video/mp4">
 		</video>
 
@@ -79,6 +79,7 @@
 			var clearOld = 50000;
 			var humorSettings = [];
 			var videoPaused = false;
+			var audioPaused = false;
 			var isDead = false;
 			var playList = [];
 			var playListIndex = 0;
@@ -87,6 +88,13 @@
 			var pauseInterval = null;
 			var speedInterval = null;
 			var connectInterval = null;
+			var currentTask = "";
+			var currentValue = "";
+			var currentAudioTrack = "";
+			var currentVideoTrack = "";
+			var playAll = false;
+			var humorStartTimeout = [];
+			var humorEndTimeout = [];
 
 			$(function() {
 				
@@ -133,13 +141,21 @@
 
 				conn.onmessage = function(e) {
 					data = {};
+					
 					if(isJson(e.data)){
 						data = JSON.parse(e.data);
+						currentTask = data.type;
+						currentValue = data.value;
+					}else if(e.data != "status"){
+						currentTask = e.data;
+						currentValue = "";
 					}
-					
 					if(e.data == "reload"){
 						window.location.reload();
-					}else if(e.data == "audioPause"){
+					}else if(e.data == "status"){
+						conn.send(JSON.stringify({type:"screenStatus", task:currentTask, value:currentValue, audioPaused:audioPaused, videoPaused:videoPaused, videoTrack:currentVideoTrack, audioTrack:currentAudioTrack, playAll:playAll}));
+                    }else if(e.data == "audioPause"){
+						audioPaused = true;
 						$('#audioSource').trigger('pause');
                     }else if(e.data == "audioPlay"){
                         $('#audioSource').trigger('play');
@@ -147,10 +163,20 @@
                         change_track("");
 					}else if(e.data == "videoPause"){
 						videoPaused = true;
+						$.each(humorStartTimeout, function(index) {
+							clearTimeout(humorStartTimeout[index]);
+						});
+						$.each(humorEndTimeout, function(index) {
+							clearTimeout(humorEndTimeout[index]);
+						});
+						$.get( "led_off.php",{}, function(rd) {
+							//alert("LED TURNED OFF");
+						}, "json");
 						$('#videoSource').trigger('pause');
                     }else if(e.data == "videoPlay"){
                         $('#videoSource').trigger('play');
 					}else if(e.data == "audioPrev"){
+						audioPaused = false;
 						playListIndex--;
 						playListIndex--;
 						if(playListIndex < 0){
@@ -159,13 +185,16 @@
 						console.log(playListIndex);
                         $('#audioSource').trigger('ended');
 					}else if(e.data == "audioNext"){
+						audioPaused = false;
 						if(playListIndex >= playList.length){
 							playListIndex = 0;
 						}
                         $('#audioSource').trigger('ended');	
 					}else if(data.type){						
 						if(data.type == "audioLoad"){
+							audioPaused = false;
 							if(data.value == "PLAY ALL"){
+								playAll = true;
 								playList = [];
 								playListIndex = 0;
 								$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
@@ -174,6 +203,7 @@
 									playListIndex++;
 								}, "json");
 							}else{
+								playAll = false;
 								change_track(data.value);
 							}									
 						}else if(data.type == "videoLoad"){
@@ -198,22 +228,18 @@
 				$("#videoSource").on("loadeddata", function(e) {
 					$.each(humorSettings, function(index) {
 						if(humorSettings[index].start){
-							setTimeout(function(isPaused){ 
-								if(!isPaused){
-									$.get( "led_on.php",{}, function(rd) {
-										//alert("LED TURNED ON");
-									}, "json");
-								}
+							humorStartTimeout[index] = setTimeout(function(isPaused){ 
+								$.get( "led_on.php",{}, function(rd) {
+									//alert("LED TURNED ON");
+								}, "json");
 								if(humorSettings[index].end > 0){
-									setTimeout(function(isPaused){ 
-										if(!isPaused){
-											$.get( "led_off.php",{}, function(rd) {
-												//alert("LED TURNED OFF");
-											}, "json");
-										}
-									}, humorSettings[index].end-humorSettings[index].start, videoPaused);
+									humorEndTimeout[index] = setTimeout(function(){ 
+										$.get( "led_off.php",{}, function(rd) {
+											//alert("LED TURNED OFF");
+										}, "json");
+									}, humorSettings[index].end-humorSettings[index].start);
 								}
-							}, humorSettings[index].start, videoPaused);	
+							}, humorSettings[index].start);	
 						}
 					});
 				});
@@ -234,19 +260,50 @@
 						playListIndex++;	
 					}
 				});
+				
+				function change_track(sourceUrl) {
+					$('#mp3_src').attr("src", sourceUrl);
+					$('#audioSource').trigger('pause');
+					$('#audioSource').trigger('load');
+					try {
+						currentAudioTrack = sourceUrl.replace("mp3/music/","");
+						currentAudioTrack = currentAudioTrack.replace(".mp3","");
+						audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
+						conn.send(audioTrackMsg);
+					}
+					catch(err) {
+						console.log(err.message);
+					}
+				}
+
+				function change_video(sourceUrl) {
+					$('#mp4_src').attr("src", sourceUrl);
+					$('#videoSource').trigger('pause');
+					$('#videoSource').trigger('load');
+					try {
+						currentVideoTrack = sourceUrl.replace("mp4/","");
+						currentVideoTrack = currentVideoTrack.replace(".mp4","");
+						videoTrackMsg = JSON.stringify({type:"videoTrack", value:currentVideoTrack});
+						conn.send(videoTrackMsg);
+					}
+					catch(err) {
+						console.log(err.message);
+					}
+				}
+
+				function loadVideo(videoData){
+					$("#terminal").html('');
+					$("#terminal").hide();
+					clearTyper();
+					change_video(videoData);
+				}
+
+				function hideVideo(){
+					$("#terminal").show();
+					change_video("");
+				}
+				
 			});
-
-			function loadVideo(data){
-				$("#terminal").html('');
-				$("#terminal").hide();
-				clearTyper();
-				change_video(data);
-			}
-
-			function hideVideo(){
-				$("#terminal").show();
-				change_video("");
-			}
 
 			function create_UUID(){
 				var dt = new Date().getTime();
@@ -269,7 +326,7 @@
 
 			function typeNext(){
 				if(isDead) return;
-				
+
 				if(!isPaused && !isLongPaused){
 
 					//clear memory
@@ -364,19 +421,6 @@
 				}, 600);
 			}
 
-			function change_track(sourceUrl) {
-				console.log(sourceUrl);
-				$('#mp3_src').attr("src", sourceUrl);
-				$('#audioSource').trigger('pause');
-				$('#audioSource').trigger('load');
-			}
-
-			function change_video(sourceUrl) {
-				$('#mp4_src').attr("src", sourceUrl);
-				$('#videoSource').trigger('pause');
-				$('#videoSource').trigger('load');
-			}
-		
 			$('body').pressure({
 				start: function(event){
 					// this is called on force start
