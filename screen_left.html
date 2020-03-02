@@ -229,6 +229,7 @@
 							humorSettings = [];
 							videoPaused = false;
 							videoName = decodeURI(data.value);
+							videoName = videoName.replace(".mov", ".json");
 							jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?uid='+create_UUID();
 							$.get( jsonFile, {}, function(rd) {
 								humorSettings = rd.humor;
@@ -336,6 +337,8 @@
 					try {
 						currentVideoTrack = sourceUrl.replace("mp4/","");
 						currentVideoTrack = currentVideoTrack.replace(".mp4","");
+						currentVideoTrack = sourceUrl.replace("mp4/","");
+						currentVideoTrack = currentVideoTrack.replace("bin/lib/720H23A2355L.mov","I'm Sorry Dave");
 						videoTrackMsg = JSON.stringify({type:"videoTrack", value:currentVideoTrack});
 						conn.send(videoTrackMsg);
 					}

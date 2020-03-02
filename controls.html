@@ -28,7 +28,8 @@
 				<div class="loader"></div>
 			</div>
 		</div>
-
+		<input id="dataTask" value=0 type="hidden">
+		<input id="dataVal" value="" type="hidden">
 		<div class="d-flex" id="wrapper">
 
 			<!-- Sidebar -->
@@ -66,40 +67,38 @@
 			<!-- Page Content -->
 			<div id="page-content-wrapper">
 				<nav class="navbar navbar-light navbar-bg-dark">
-					
-						<button type="button" id="menu-toggle" class="btn btn-link text-dark">
-							<i class="fas fa-align-left"></i>
-						</button>
-						<h3 class="text-light">TARS CONTROLS</h3>
-						<button type="button" id="ctr-refresh" class="btn btn-link text-dark">
-							<i class="fa fa-sync-alt"></i>
-						</button>
-						<!-- <button class="navbar-toggler invisible" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-							<span class="navbar-toggler-icon"></span>
-						</button> -->
+					<button type="button" id="menu-toggle" class="btn btn-link text-dark">
+						<i class="fas fa-align-left"></i>
+					</button>
+					<h3 class="text-light">TARS CONTROLS</h3>
+					<button type="button" id="ctr-refresh" class="btn btn-link text-dark">
+						<i class="fa fa-sync-alt"></i>
+					</button>
+					<!-- <button class="navbar-toggler invisible" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button> -->
 
-						<!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
-							<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-								<li class="nav-item active">
-								<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-								</li>
-								<li class="nav-item">
-								<a class="nav-link" href="#">Link</a>
-								</li>
-								<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									Dropdown
-								</a>
-								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-									<a class="dropdown-item" href="#">Action</a>
-									<a class="dropdown-item" href="#">Another action</a>
-									<div class="dropdown-divider"></div>
-									<a class="dropdown-item" href="#">Something else here</a>
-								</div>
-								</li>
-							</ul>
-						</div> -->
-					
+					<!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
+						<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+							<li class="nav-item active">
+							<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+							</li>
+							<li class="nav-item">
+							<a class="nav-link" href="#">Link</a>
+							</li>
+							<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Dropdown
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="#">Action</a>
+								<a class="dropdown-item" href="#">Another action</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="#">Something else here</a>
+							</div>
+							</li>
+						</ul>
+					</div> -->
 				</nav>
 				
 				<!-- container-fluid -->
@@ -125,6 +124,7 @@
 						<div id="videoList" class="dropdown-menu w-100" aria-labelledby="dropdownMenu">						
 						</div>
 					</div>
+					<button type="button" class="btn btn-danger btn-lg w-100 mt-3" id="HAL" style="display: none;">HAL 9000</button>
 					<div id="videoCntrl" style="display:none;" class="controls p-3 rounded-bottom">
 						<div class="text-center w-100 text-light">
 							<h5 id="videoTrack"></h5>
@@ -250,6 +250,7 @@
 								}
 							}
 						}else if(data.type == "audioTrack"){
+							$('#dataVal').val(data.value);
 							$('#audioTrack').text(data.value);
 						}else if(data.type == "videoTrack"){
 							$('#videoTrack').text(data.value);
@@ -314,7 +315,16 @@
 				$('#clickVideoStop').on('click', function() {
 					togglePause('#clickVideo', true);
 					sendMessage('videoStop');
-				});	
+				});
+				$('#HAL').on('click', function() {
+					if($('#audioCntrl').css('display') != 'none'){
+						alert("Please Eject Music First");
+						return;
+					}
+					togglePause('#clickVideo', false);
+					sendMessage(JSON.stringify({type:"videoLoad", value:"bin/lib/720H23A2355L.mov"}));
+					$('#videoCntrl').show();				
+				});
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					if($('#audioCntrl').css('display') != 'none'){
 						alert("Please Eject Music First");
@@ -325,6 +335,8 @@
 					$('#videoCntrl').show();				
 				});
 				$('#musicList').on('click', '.clickMusicPlay', function() {
+					$('#dataTask').val(0);
+					$('#dataVal').val($(this).text());
 					if($('#videoCntrl').css('display') != 'none'){
 						alert("Please Eject Video First");
 						return;
@@ -361,10 +373,24 @@
 					sendMessage('audioPlay');
 				});
 				$('#clickAudioStop').on('click', function() {
+					if($('#HAL').css('display') == 'none'){
+						if($('#dataVal').val() == "S.T.A.Y"){
+							setTimeout(function () {
+								$('#dataTask').val(0);
+							}, 5000)
+							dt = Number($('#dataTask').val())+1;
+							$('#dataTask').val(dt);
+						}
+					}
 					togglePause('#clickAudio', true);
 					sendMessage('audioStop');
 				});	
 				$('#clickAudioEject').on('click', function() {
+					if($('#HAL').css('display') == 'none'){
+						if($('#dataTask').val() >= 3){
+							$('#HAL').show();
+						}
+					}
 					sendMessage('audioEject');
 					$('#audioCntrl').hide();
 				});
