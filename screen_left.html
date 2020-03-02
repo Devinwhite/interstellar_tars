@@ -249,6 +249,11 @@
 					console.log(e.data);
 				};
 
+				
+				/* $("#audioSource").on("play", function(e) {
+					conn.send("received");
+				}); */
+
 				$("#videoSource").on("play", function(e) {
 					clearInterval(playInterval);
 					playInterval = setInterval(humorTimeCheck, 50);
@@ -298,6 +303,7 @@
 						change_track("mp3/music/"+playList[playListIndex]);
 						playListIndex++;	
 					}
+					conn.send("received");
 				});
 
 				function resetPlayList(){
@@ -314,15 +320,10 @@
 						$('#audioSource').trigger('pause');
 					}
 					if(!soundBoard){
-						try {
-							currentAudioTrack = sourceUrl.replace("mp3/music/","");
-							currentAudioTrack = currentAudioTrack.replace(".mp3","");
-							audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
-							conn.send(audioTrackMsg);
-						}
-						catch(err) {
-							console.log(err.message);
-						}
+						currentAudioTrack = sourceUrl.replace("mp3/music/","");
+						currentAudioTrack = currentAudioTrack.replace(".mp3","");
+						audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
+						conn.send(audioTrackMsg);
 					}
 				}
 
@@ -334,17 +335,12 @@
 					if(autoPause){
 						$('#videoSource').trigger('pause');
 					}
-					try {
-						currentVideoTrack = sourceUrl.replace("mp4/","");
-						currentVideoTrack = currentVideoTrack.replace(".mp4","");
-						currentVideoTrack = sourceUrl.replace("mp4/","");
-						currentVideoTrack = currentVideoTrack.replace("bin/lib/720H23A2355L.mov","I'm Sorry Dave");
-						videoTrackMsg = JSON.stringify({type:"videoTrack", value:currentVideoTrack});
-						conn.send(videoTrackMsg);
-					}
-					catch(err) {
-						console.log(err.message);
-					}
+					currentVideoTrack = sourceUrl.replace("mp4/","");
+					currentVideoTrack = currentVideoTrack.replace(".mp4","");
+					currentVideoTrack = sourceUrl.replace("mp4/","");
+					currentVideoTrack = currentVideoTrack.replace("bin/lib/720H23A2355L.mov","I'm Sorry Dave");
+					videoTrackMsg = JSON.stringify({type:"videoTrack", value:currentVideoTrack});
+					conn.send(videoTrackMsg);
 				}
 
 				function loadVideo(videoData){

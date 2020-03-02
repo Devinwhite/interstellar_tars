@@ -102,7 +102,7 @@
 				</nav>
 				
 				<!-- container-fluid -->
-				<div class="container py-4">
+				<div class="container py-4" id="controlsContainer">
 					<div class="w-100 bg-light p-2 rounded mb-3" id="errorMessage" style="display: none;"></div>
 					<div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
 						<label class="btn btn-dark btn-lg active" id="clickOff">
@@ -230,6 +230,8 @@
 					console.log(e.data);
 					if(e.data == "videoDone"){
 						reloadScreen();
+					}else if(e.data == "received"){
+						$('#loaderModal').modal('hide');
 					}else if(data.type){						
 						if(data.type == "screenStatus"){
 							if(data.task.toLowerCase().includes("video")){
@@ -354,11 +356,14 @@
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
+					$('#loaderModal').modal('show');
 					if($('#audioCntrl').css('display') != 'none'){
+						$('#loaderModal').modal('hide');
 						alert("Please Eject Music First");
 						return;
 					}
 					if($('#videoCntrl').css('display') != 'none'){
+						$('#loaderModal').modal('hide');
 						alert("Please Eject Video First");
 						return;
 					}
@@ -415,10 +420,12 @@
 				});
 				$('#getUpdates').on('click', function() {
 					if(confirm("This will updated ALL the TARS screen software. Are you sure you want to update?")){
+						$('#loaderModal').modal('show');
 						$.get( "getUpdates.php",{}, function(rd) {
 							sendMessage('reload');
 							window.location.reload();
 						}, "json").fail(function() {
+							$('#loaderModal').modal('hide');
 							alert('Something Went Wrong!');
 						});
 					}
