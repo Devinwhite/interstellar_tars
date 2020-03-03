@@ -195,10 +195,10 @@
 										if(conn.readyState == WebSocket.OPEN){
 											$('#errorMessage').prepend('<p><span style="color: green;">SUCCESS:</span> New Connection</p>');
 											$('#errorMessage').hide();
-											$('#loaderModal').modal('hide');
+											//$('#loaderModal').modal('hide');
 											alert("Connection Restored.");
 										}else{
-											$('#loaderModal').modal('hide');
+											//$('#loaderModal').modal('hide');
 											alert("Connection Failed.");
 										}
 									}, 2000);		
@@ -233,7 +233,7 @@
 					if(e.data == "videoDone"){
 						reloadScreen();
 					}else if(e.data == "received"){
-						$('#loaderModal').modal('hide');
+						//$('#loaderModal').modal('hide');
 					}else if(data.type){						
 						if(data.type == "screenStatus"){
 							if(data.task.toLowerCase().includes("video")){
@@ -359,7 +359,7 @@
 					$('#audioCntrl').show();
 				});				
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
-					$('#loaderModal').modal('show');
+					//$('#loaderModal').modal('show');
 					if($('#audioCntrl').css('display') != 'none'){
 						$('#audioCntrl').hide();
 					}
@@ -419,12 +419,12 @@
 				});
 				$('#getUpdates').on('click', function() {
 					if(confirm("This will updated ALL the TARS screen software. Are you sure you want to update?")){
-						$('#loaderModal').modal('show');
+						//$('#loaderModal').modal('show');
 						$.get( "getUpdates.php",{}, function(rd) {
 							sendMessage('reload');
 							window.location.reload();
 						}, "json").fail(function() {
-							$('#loaderModal').modal('hide');
+							//$('#loaderModal').modal('hide');
 							alert('Something Went Wrong!');
 						});
 					}

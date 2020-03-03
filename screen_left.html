@@ -304,6 +304,7 @@
 				});
 
 				$("#audioSource").on('ended',function() { 
+					conn.send("received");
 					if(playList.length > 0){
 						if(playListIndex > playList.length){
 							playListIndex = 0;
@@ -311,7 +312,6 @@
 						change_track("mp3/music/"+playList[playListIndex]);
 						playListIndex++;	
 					}
-					conn.send("received");
 				});
 
 				function resetPlayList(){
