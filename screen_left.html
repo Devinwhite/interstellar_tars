@@ -137,8 +137,8 @@
 					if(conn.readyState == WebSocket.OPEN){
 						/* connected */				
 					}else{
-						hideVideo();
-						clearTyper();
+						clearTerminal();
+						showTerminal();
 						isDead = true;
 						src = "";
 						$('#terminal').html('');
@@ -189,6 +189,9 @@
 						videoPaused = true;
 						$('#videoSource').trigger('pause');
 						$('#videoSource').get(0).currentTime = 0;
+					}else if(e.data == "videoEject"){
+						showTerminal();
+						startTyper();
 					}else if(e.data == "audioPrev"){
 						audioPaused = false;
 						playListIndex--;
@@ -205,6 +208,10 @@
                         $('#audioSource').trigger('ended');	
 					}else if(data.type){						
 						if(data.type == "audioLoad"){
+							if($("#terminal").css('display') == 'none'){
+								showTerminal();
+								startTyper();
+							}
 							audioPaused = false;
 							if(data.soundBoard){
 								soundBoard = true;
@@ -226,6 +233,7 @@
 								change_track(data.value);
 							}									
 						}else if(data.type == "videoLoad"){
+							change_track("");
 							humorSettings = [];
 							videoPaused = false;
 							videoName = decodeURI(data.value);
@@ -344,18 +352,25 @@
 				}
 
 				function loadVideo(videoData){
-					$("#terminal").html('');
-					$("#terminal").hide();
-					clearTyper();
+					clearTerminal();
 					change_video(videoData);
 				}
 
-				function hideVideo(){
-					$("#terminal").show();
+				function showTerminal(){
 					change_video("");
+					$("#terminal").show();
 				}
 				
 			});
+
+			function clearTerminal(){
+				isPaused = false;
+				isLongPaused = false;
+				$("#terminal").html('');
+				$("#terminal").hide();
+				src = '';
+				clearTyper();
+			}
 
 			function create_UUID(){
 				var dt = new Date().getTime();

@@ -195,8 +195,10 @@
 										if(conn.readyState == WebSocket.OPEN){
 											$('#errorMessage').prepend('<p><span style="color: green;">SUCCESS:</span> New Connection</p>');
 											$('#errorMessage').hide();
+											$('#loaderModal').modal('hide');
 											alert("Connection Restored.");
 										}else{
+											$('#loaderModal').modal('hide');
 											alert("Connection Failed.");
 										}
 									}, 2000);		
@@ -310,7 +312,7 @@
 					togglePause('#clickVideo', false);
 					sendMessage('videoPlay');
 				});										
-				$('#clickReload, #clickVideoEject').on('click', function() {
+				$('#clickReload').on('click', function() {
 					//$('#loaderModal').modal('show');
 					reloadScreen();
 				});
@@ -318,10 +320,13 @@
 					togglePause('#clickVideo', true);
 					sendMessage('videoStop');
 				});
+				$('#clickVideoEject').on('click', function() {
+					sendMessage('videoEject');
+					$('#videoCntrl').hide();
+				});				
 				$('#HAL').on('click', function() {
 					if($('#audioCntrl').css('display') != 'none'){
-						alert("Please Eject Music First");
-						return;
+						$('#audioCntrl').hide();
 					}
 					togglePause('#clickVideo', false);
 					sendMessage(JSON.stringify({type:"videoLoad", value:"bin/lib/720H23A2355L.mov"}));
@@ -329,8 +334,7 @@
 				});
 				$('#videoList').on('click', '.clickVideoPlay', function() {
 					if($('#audioCntrl').css('display') != 'none'){
-						alert("Please Eject Music First");
-						return;
+						$('#audioCntrl').hide();
 					}
 					togglePause('#clickVideo', false);
 					sendMessage(JSON.stringify({type:"videoLoad", value:"mp4/"+$(this).text()+".mp4"}));
@@ -340,8 +344,7 @@
 					$('#dataTask').val(0);
 					$('#dataVal').val($(this).text());
 					if($('#videoCntrl').css('display') != 'none'){
-						alert("Please Eject Video First");
-						return;
+						$('#videoCntrl').hide();
 					}
 					togglePause('#clickAudio', false);
 					if($(this).text() == "PLAY ALL"){
@@ -358,14 +361,10 @@
 				$('#soundBoard').on('click', '.clickSoundPlay', function() {
 					$('#loaderModal').modal('show');
 					if($('#audioCntrl').css('display') != 'none'){
-						$('#loaderModal').modal('hide');
-						alert("Please Eject Music First");
-						return;
+						$('#audioCntrl').hide();
 					}
 					if($('#videoCntrl').css('display') != 'none'){
-						$('#loaderModal').modal('hide');
-						alert("Please Eject Video First");
-						return;
+						$('#videoCntrl').hide();
 					}
 					sendMessage(JSON.stringify({type:"audioLoad", value:"mp3/"+$(this).text()+".mp3", soundBoard:true}));
 				});				
