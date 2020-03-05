@@ -85,6 +85,7 @@
 			var isDead = false;
 			var playList = [];
 			var playListIndex = 0;
+			var playListDelay = 0;
 			var wsURI = 'ws://'+location.hostname+':8080';
 			var interval = null;
 			var pauseInterval = null;
@@ -99,6 +100,9 @@
 			var soundBoard = false;
 			var startTimes = {};
 			var endTimes = {};
+			var demoMode = false;
+			var demo = {};
+			var pauseTimeout = null;
 
 			$(function() {
 				
@@ -153,8 +157,17 @@
 				}
 
 				conn.onmessage = function(e) {
+					connectionMessage(e)
+				};
+
+				function messageHandler(event){
+					var e = {};
+					e.data = event;
+					connectionMessage(e);
+				}
+
+				function connectionMessage(e){
 					data = {};
-					
 					if(isJson(e.data)){
 						data = JSON.parse(e.data);
 						currentTask = data.type;
@@ -163,6 +176,7 @@
 						currentTask = e.data;
 						currentValue = "";
 					}
+					
 					if(e.data == "reload"){
 						window.location.reload();
 					}else if(e.data == "status"){
@@ -170,7 +184,84 @@
                     }else if(e.data == "audioPause"){
 						audioPaused = true;
 						$('#audioSource').trigger('pause');
-                    }else if(e.data == "audioPlay"){
+                    }else if(e.data == "demoMode"){
+						demoMode = true;
+						playAll = true;
+						playList = [];
+						playListIndex = 0;
+						demo.playTwoSongs = 1;
+						$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
+							playList = rd;
+							playListIndex = getRandomInt(0,playList.length-1);
+							change_track("mp3/music/"+playList[playListIndex]);
+							playListIndex++;
+							if(playListIndex > playList.length-1){
+								playListIndex = 0;
+							}
+						}, "json");						
+					}else if(e.data == "demoModeStep2"){
+						demoMode = true;
+						demo.playHumorVideo = 1;
+						change_track("");
+						humorSettings = [];
+						videoPaused = false;
+						videoName = "mp4/Interstellar - TARS Humor Setting.mp4";
+						jsonFile = encodeURI(videoName.replace(".mp4", ".json"))+'?uid='+create_UUID();
+						$.get( jsonFile, {}, function(rd) {
+							humorSettings = rd.humor;
+							$.each(humorSettings, function(index) {
+								startTimes[humorSettings[index].start] = true;
+								endTimes[humorSettings[index].end] = true;
+							});
+							loadVideo(videoName);
+						}, "json").fail(function() {
+							loadVideo(videoName);
+						});
+					}else if(e.data == "demoModeStep3"){
+						demoMode = true;
+						reloadTyper();
+						playAll = true;
+						playList = [];
+						playListIndex = 0;
+						demo.playTwoSoundBoard = 1;
+						playListDelay = 5000;
+						soundBoard = true;
+						$.get( "loadFiles.php?folder=mp3/&filter=*.mp3",{}, function(rd) {
+							playList = rd;
+							playListIndex = getRandomInt(0,playList.length-1);
+							change_track("mp3/"+playList[playListIndex],false,playListDelay);
+							playListIndex++;
+							if(playListIndex > playList.length-1){
+								playListIndex = 0;
+							}
+						}, "json");
+					}else if(e.data == "demoModeStep4"){
+						demoMode = true;
+						playAll = true;
+						playList = [];
+						playListIndex = 0;
+						demo.playTwoSongsSecondRound = 1;
+						$.get( "loadFiles.php?folder=mp3/music/&filter=*.mp3",{}, function(rd) {
+							playList = rd;
+							playListIndex = getRandomInt(0,playList.length-1);
+							change_track("mp3/music/"+playList[playListIndex],false,playListDelay);
+							playListIndex++;
+							if(playListIndex > playList.length-1){
+								playListIndex = 0;
+							}
+						}, "json");
+					}else if(e.data == "demoModeStep5"){
+						demoMode = true;
+						demo.playBTVVideo = 1;
+						change_track("");
+						humorSettings = [];
+						videoPaused = false;
+						loadVideo("mp4/Interstellar Bonus Disc TARS.mp4");			
+					}else if(e.data == "demoModeStep6"){
+						demoMode = true;
+						reloadTyper();					
+						messageHandler("demoMode");		
+					}else if(e.data == "audioPlay"){
 						audioPaused = false;
                         $('#audioSource').trigger('play');
 					}else if(e.data == "audioStop"){
@@ -190,8 +281,7 @@
 						$('#videoSource').trigger('pause');
 						$('#videoSource').get(0).currentTime = 0;
 					}else if(e.data == "videoEject"){
-						showTerminal();
-						startTyper();
+						reloadTyper();
 					}else if(e.data == "audioPrev"){
 						audioPaused = false;
 						playListIndex--;
@@ -209,8 +299,7 @@
 					}else if(data.type){						
 						if(data.type == "audioLoad"){
 							if($("#terminal").css('display') == 'none'){
-								showTerminal();
-								startTyper();
+								reloadTyper();
 							}
 							audioPaused = false;
 							if(data.soundBoard){
@@ -226,6 +315,9 @@
 									playList = rd;
 									change_track("mp3/music/"+playList[0]);
 									playListIndex++;
+									if(playListIndex > playList.length-1){
+										playListIndex = 0;
+									}
 								}, "json");
 							}else{
 								resetPlayList();
@@ -255,7 +347,7 @@
 						window.location.href = e.data;
 					} */
 					console.log(e.data);
-				};
+				}
 
 				
 				/* $("#audioSource").on("play", function(e) {
@@ -297,19 +389,58 @@
 				}				 
 
 				$("#videoSource").on('ended',function() { 
+					
+					if(demoMode && demo.playHumorVideo == 1){
+						demo.playHumorVideo = 0;
+						messageHandler("demoModeStep3");
+						return;
+					}
+					if(demoMode && demo.playBTVVideo == 1){
+						demo.playBTVVideo = 0;
+						messageHandler("demoModeStep6");
+						return;
+					}
+					
 					$.get( "led_off.php",{}, function(rd) {
 						conn.send('videoDone');
 						window.location.reload();
-					}, "json");
+					}, "json");				
 				});
 
 				$("#audioSource").on('ended',function() { 
+					if(demoMode && demo.playTwoSongs == 1){
+						demo.playTwoSongs = demo.playTwoSongs+1;
+					}else if(demoMode && demo.playTwoSongs == 2){
+						demo.playTwoSongs = 0;
+						messageHandler("demoModeStep2");
+						return;
+					}
+					if(demoMode && demo.playTwoSoundBoard == 1){
+						demo.playTwoSoundBoard = demo.playTwoSoundBoard+1;
+					}else if(demoMode && demo.playTwoSoundBoard == 2){
+						demo.playTwoSoundBoard = 0;
+						soundBoard = false;
+						messageHandler("demoModeStep4");
+						return;
+					}
+					if(demoMode && demo.playTwoSongsSecondRound == 1){
+						playListDelay=0;
+						demo.playTwoSongsSecondRound = demo.playTwoSongsSecondRound+1;
+					}else if(demoMode && demo.playTwoSongsSecondRound == 2){
+						demo.playTwoSongsSecondRound = 0;
+						messageHandler("demoModeStep5");
+						return;
+					}
 					conn.send("received");
 					if(playList.length > 0){
 						if(playListIndex > playList.length){
 							playListIndex = 0;
 						}
-						change_track("mp3/music/"+playList[playListIndex]);
+						if(soundBoard){
+							change_track("mp3/"+playList[playListIndex],false,playListDelay);
+						}else{
+							change_track("mp3/music/"+playList[playListIndex],false,playListDelay);
+						}
 						playListIndex++;	
 					}
 				});
@@ -319,17 +450,32 @@
 					playListIndex = 0;
 				}
 				
-				function change_track(sourceUrl,autoPause) {
+				function change_track(sourceUrl,autoPause,delay) {
 					$('#audioSource').trigger('pause');
-					$('#mp3_src').attr("src", sourceUrl);
-					$('#audioSource').trigger('pause');
-					$('#audioSource').trigger('load');
+					console.log(sourceUrl);
+					
 					if(autoPause){
 						$('#audioSource').trigger('pause');
 					}
+					if(delay){
+						setTimeout(function () {
+							$('#mp3_src').attr("src", sourceUrl);
+							$('#audioSource').trigger('pause');
+							$('#audioSource').trigger('load');
+						}, delay);
+					}else{
+						$('#mp3_src').attr("src", sourceUrl);
+						$('#audioSource').trigger('pause');
+						$('#audioSource').trigger('load');
+					}
+
 					if(!soundBoard){
-						currentAudioTrack = sourceUrl.replace("mp3/music/","");
-						currentAudioTrack = currentAudioTrack.replace(".mp3","");
+						if(sourceUrl && sourceUrl.length){
+							currentAudioTrack = sourceUrl.replace("mp3/music/","");
+							currentAudioTrack = currentAudioTrack.replace(".mp3","");
+						}else{
+							currentAudioTrack = "";
+						}
 						audioTrackMsg = JSON.stringify({type:"audioTrack", value:currentAudioTrack});
 						conn.send(audioTrackMsg);
 					}
@@ -343,12 +489,17 @@
 					if(autoPause){
 						$('#videoSource').trigger('pause');
 					}
-					currentVideoTrack = sourceUrl.replace("mp4/","");
-					currentVideoTrack = currentVideoTrack.replace(".mp4","");
-					currentVideoTrack = sourceUrl.replace("mp4/","");
-					currentVideoTrack = currentVideoTrack.replace("bin/lib/720H23A2355L.mov","I'm Sorry Dave");
+					if(sourceUrl && sourceUrl.length){
+						currentVideoTrack = sourceUrl.replace("mp4/","");
+						currentVideoTrack = currentVideoTrack.replace(".mp4","");
+						currentVideoTrack = sourceUrl.replace("mp4/","");
+						currentVideoTrack = currentVideoTrack.replace("bin/lib/720H23A2355L.mov","I'm Sorry Dave");
+					}else{
+						currentVideoTrack = "";
+					}
 					videoTrackMsg = JSON.stringify({type:"videoTrack", value:currentVideoTrack});
 					conn.send(videoTrackMsg);
+					
 				}
 
 				function loadVideo(videoData){
@@ -360,17 +511,24 @@
 					change_video("");
 					$("#terminal").show();
 				}
-				
-			});
 
-			function clearTerminal(){
-				isPaused = false;
-				isLongPaused = false;
-				$("#terminal").html('');
-				$("#terminal").hide();
-				src = '';
-				clearTyper();
-			}
+				function reloadTyper(){
+					clearTerminal();
+					showTerminal();
+					startTyper();
+				}
+
+				function clearTerminal(){
+					isPaused = false;
+					isLongPaused = false;
+					$("#terminal").html('');
+					$("#terminal").hide();
+					src = '';
+					clearTyper();
+					clearTimeout(pauseTimeout);
+				}
+
+			});
 
 			function create_UUID(){
 				var dt = new Date().getTime();
@@ -454,6 +612,7 @@
 					$("#terminal").scrollTop($("#terminal")[0].scrollHeight);
 				}else{
 					clearTyper();
+					clearTimeout(pauseTimeout);
 					if(isLongPaused){
 						pauseTimeout = setTimeout(function () {
 							isLongPaused = false;
@@ -469,7 +628,9 @@
 			};
 
 			function getRandomInt(min, max) {
-				return Math.floor(Math.random() * (max - min + 1) + min);
+				min = Math.ceil(min);
+				max = Math.floor(max);
+				return Math.floor(Math.random() * (max - min + 1)) + min;
 			}
 
 			function clearTyper(){
